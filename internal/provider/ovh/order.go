@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 // OrderURL links to OVH's express order review page with the cart pre-filled: the plan at one

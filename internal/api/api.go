@@ -16,12 +16,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/gucc/stockwatch/internal/auth"
-	"github.com/gucc/stockwatch/internal/monitor"
-	"github.com/gucc/stockwatch/internal/notify"
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/settings"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/auth"
+	"github.com/Guccbai/stockwatch/internal/monitor"
+	"github.com/Guccbai/stockwatch/internal/notify"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/settings"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 type Server struct {

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 type datacenter struct{ code, city, country, flag string }

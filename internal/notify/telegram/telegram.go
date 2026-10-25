@@ -14,10 +14,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/labels"
-	"github.com/gucc/stockwatch/internal/notify"
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/settings"
+	"github.com/Guccbai/stockwatch/internal/labels"
+	"github.com/Guccbai/stockwatch/internal/notify"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/settings"
 )
 
 const maxLines = 25

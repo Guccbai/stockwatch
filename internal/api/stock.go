@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 var statusRank = map[provider.StockStatus]int{

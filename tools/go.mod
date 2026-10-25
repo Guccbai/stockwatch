@@ -1,6 +1,6 @@
 // Development tools, kept out of the main module so their dependencies never
 // affect the app. Run with: go tool -modfile=tools/go.mod <tool>
-module github.com/gucc/stockwatch/tools
+module github.com/Guccbai/stockwatch/tools
 
 go 1.27.3
 

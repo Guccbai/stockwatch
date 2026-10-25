@@ -14,12 +14,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/auth"
-	"github.com/gucc/stockwatch/internal/monitor"
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/provider/fake"
-	"github.com/gucc/stockwatch/internal/settings"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/auth"
+	"github.com/Guccbai/stockwatch/internal/monitor"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider/fake"
+	"github.com/Guccbai/stockwatch/internal/settings"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 func newTestServer(t *testing.T) (*httptest.Server, *http.Client) {

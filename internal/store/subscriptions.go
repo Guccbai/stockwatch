@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 const (

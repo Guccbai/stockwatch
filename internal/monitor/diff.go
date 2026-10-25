@@ -3,8 +3,8 @@ package monitor
 import (
 	"time"
 
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 // Kind classifies a transition for notification purposes.

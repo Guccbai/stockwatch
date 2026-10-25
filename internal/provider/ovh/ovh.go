@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 type regionInfo struct {
@@ -72,7 +72,7 @@ func (p *Provider) getJSON(ctx context.Context, u string, v any) error {
 		return err
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "stockwatch/1.0 (+https://github.com/gucc/stockwatch)")
+	req.Header.Set("User-Agent", "stockwatch/1.0 (+https://github.com/Guccbai/stockwatch)")
 	resp, err := p.client.Do(req)
 	if err != nil {
 		return err

@@ -6,7 +6,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 type Provider struct {

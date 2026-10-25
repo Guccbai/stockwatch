@@ -1,4 +1,4 @@
-module github.com/gucc/stockwatch
+module github.com/Guccbai/stockwatch
 
 go 1.27.3
 

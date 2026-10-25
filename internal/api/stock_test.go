@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 // suffixPricer prices "p.big" at base+100 and "p.small" at base; anything else is unpriced.

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 func TestMapStatus(t *testing.T) {

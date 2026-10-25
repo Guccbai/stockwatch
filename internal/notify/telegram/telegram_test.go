@@ -12,10 +12,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/gucc/stockwatch/internal/notify"
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/settings"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/notify"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/settings"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 func TestFormatAlert(t *testing.T) {

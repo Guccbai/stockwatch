@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 // StockRow is the persisted current state of one availability slot.

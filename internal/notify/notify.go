@@ -4,8 +4,8 @@ package notify
 import (
 	"context"
 
-	"github.com/gucc/stockwatch/internal/provider"
-	"github.com/gucc/stockwatch/internal/store"
+	"github.com/Guccbai/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/store"
 )
 
 // Alert groups the transitions of one poll that matched one subscription.

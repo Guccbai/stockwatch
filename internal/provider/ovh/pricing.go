@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gucc/stockwatch/internal/provider"
+	"github.com/Guccbai/stockwatch/internal/provider"
 )
 
 // ConfigPrice prices an availability fqn ("24adv01-v3.ram-128g-on-die-ecc-3600.softraid-2x960nvme-pcie-gen4")
