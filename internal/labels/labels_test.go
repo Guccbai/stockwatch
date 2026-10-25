@@ -2,6 +2,7 @@ package labels
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -38,6 +39,15 @@ func TestHardware(t *testing.T) {
 func TestConfig(t *testing.T) {
 	if got, want := Config("24sk602.ram-128g-ecc-2400.softraid-2x1000nvme", "24sk602"), "内存 128GB ECC 2400MHz · 硬盘 2×1TB NVMe · 软 RAID"; got != want {
 		t.Errorf("got %q, want %q", got, want)
+	}
+	for _, cfg := range []string{
+		"24advstor01-v3.ram-128g-on-die-ecc-3600.hardraid-2x22000sas.softraid-2x960nvme-pcie-gen4-system",
+		"24risestor01-v1.ram-128g-ecc-2666.softraid-4x14000sas.softraid-2x480ssd",
+	} {
+		got := Config(cfg, strings.SplitN(cfg, ".", 2)[0])
+		if !strings.Contains(got, "硬盘 2×22TB SAS") && !strings.Contains(got, "硬盘 4×14TB SAS") || !strings.Contains(got, "系统盘 2×") {
+			t.Errorf("Config(%s) = %q, want data disks and 系统盘", cfg, got)
+		}
 	}
 	if got, want := Config("fake-small.cfg-a.cfg-b", "fake-small"), "cfg-a / cfg-b"; got != want {
 		t.Errorf("got %q, want %q", got, want)

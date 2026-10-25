@@ -152,31 +152,58 @@ func convertAvailability(region string, entries []availabilityEntry) []provider.
 
 // --- catalog ---
 
+type pricing struct {
+	Capacities   []string `json:"capacities"`
+	Commitment   int      `json:"commitment"`
+	Interval     int      `json:"interval"`
+	IntervalUnit string   `json:"intervalUnit"`
+	Mode         string   `json:"mode"`
+	Price        int64    `json:"price"` // in 1e-8 of the currency unit
+}
+
+// noCommitment returns the monthly renewal and one-time installation price of the plain
+// pay-monthly offer (no upfront or commitment discount); -1 when absent.
+func noCommitment(ps []pricing) (monthly, setup int64) {
+	monthly, setup = -1, -1
+	for _, pr := range ps {
+		if pr.Mode != "default" || pr.Commitment != 0 {
+			continue
+		}
+		if pr.Interval == 1 && pr.IntervalUnit == "month" && contains(pr.Capacities, "renew") && (monthly < 0 || pr.Price < monthly) {
+			monthly = pr.Price
+		}
+		if contains(pr.Capacities, "installation") && (setup < 0 || pr.Price < setup) {
+			setup = pr.Price
+		}
+	}
+	return monthly, setup
+}
+
+func money(v int64) float64 { return float64(max(v, 0)) / 1e8 }
+
 type catalog struct {
 	Locale struct {
 		CurrencyCode string `json:"currencyCode"`
 	} `json:"locale"`
 	Plans []struct {
-		PlanCode    string `json:"planCode"`
-		InvoiceName string `json:"invoiceName"`
-		Product     string `json:"product"`
-		Pricings    []struct {
-			Capacities   []string `json:"capacities"`
-			Commitment   int      `json:"commitment"`
-			Interval     int      `json:"interval"`
-			IntervalUnit string   `json:"intervalUnit"`
-			Mode         string   `json:"mode"`
-			Price        int64    `json:"price"` // in 1e-8 of the currency unit
-		} `json:"pricings"`
+		PlanCode       string    `json:"planCode"`
+		InvoiceName    string    `json:"invoiceName"`
+		Product        string    `json:"product"`
+		Pricings       []pricing `json:"pricings"`
 		Configurations []struct {
 			Name   string   `json:"name"`
 			Values []string `json:"values"`
 		} `json:"configurations"`
 		AddonFamilies []struct {
-			Name    string `json:"name"`
-			Default string `json:"default"`
+			Name    string   `json:"name"`
+			Default string   `json:"default"`
+			Addons  []string `json:"addons"`
 		} `json:"addonFamilies"`
 	} `json:"plans"`
+	Addons []struct {
+		PlanCode string    `json:"planCode"`
+		Pricings []pricing `json:"pricings"`
+	} `json:"addons"`
 	Products []struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
@@ -211,6 +238,9 @@ func (p *Provider) FetchCatalog(ctx context.Context, region string) ([]provider.
 	return convertCatalog(r, &c), nil
 }
 
+// pricedFamilies are the addon families that make up a server configuration.
+var pricedFamilies = map[string]bool{"memory": true, "storage": true, "system-storage": true, "bandwidth": true}
+
 var familyByPrefix = []struct{ prefix, family string }{
 	{"KS-", "Kimsufi"},
 	{"SYS-", "So you Start"},
@@ -242,6 +272,12 @@ func convertCatalog(r regionInfo, c *catalog) []provider.Product {
 			}
 		}
 		techs[pr.Name] = t
+	}
+
+	addonPrice := make(map[string][2]int64, len(c.Addons))
+	for _, a := range c.Addons {
+		m, s := noCommitment(a.Pricings)
+		addonPrice[a.PlanCode] = [2]int64{m, s}
 	}
 
 	currency := c.Locale.CurrencyCode
@@ -276,9 +312,18 @@ func convertCatalog(r regionInfo, c *catalog) []provider.Product {
 		if t.freq > 0 {
 			specs["frequency"] = fmt.Sprintf("%.1f GHz", t.freq)
 		}
+		var options []provider.Option
 		for _, af := range pl.AddonFamilies {
-			if (af.Name == "memory" || af.Name == "storage" || af.Name == "bandwidth") && af.Default != "" {
+			if !pricedFamilies[af.Name] {
+				continue
+			}
+			if af.Default != "" {
 				specs[af.Name] = af.Default
+			}
+			for _, code := range af.Addons {
+				if ap, ok := addonPrice[code]; ok {
+					options = append(options, provider.Option{Family: af.Name, Code: code, Price: money(ap[0]), SetupFee: money(ap[1])})
+				}
 			}
 		}
 
@@ -289,14 +334,7 @@ func convertCatalog(r regionInfo, c *catalog) []provider.Product {
 			}
 		}
 
-		var price int64 = -1
-		for _, pr := range pl.Pricings {
-			if pr.Interval == 1 && pr.IntervalUnit == "month" && pr.Commitment == 0 && pr.Mode == "default" && contains(pr.Capacities, "renew") {
-				if price < 0 || pr.Price < price {
-					price = pr.Price
-				}
-			}
-		}
+		price, setup := noCommitment(pl.Pricings)
 
 		out = append(out, provider.Product{
 			Provider:  "ovh",
@@ -305,10 +343,12 @@ func convertCatalog(r regionInfo, c *catalog) []provider.Product {
 			Name:      name,
 			Family:    family,
 			Specs:     specs,
-			Price:     float64(max(price, 0)) / 1e8,
+			Price:     money(price),
+			SetupFee:  money(setup),
 			Currency:  currency,
 			Locations: locations,
 			OrderURL:  r.OrderURL,
+			Options:   options,
 		})
 	}
 	return out

@@ -18,8 +18,8 @@ func (s *Store) ReplaceProducts(ctx context.Context, providerID, region string, 
 	if _, err := tx.ExecContext(ctx, "DELETE FROM products WHERE provider = ? AND region = ?", providerID, region); err != nil {
 		return err
 	}
-	st, err := tx.PrepareContext(ctx, `INSERT OR REPLACE INTO products(provider, region, code, name, family, specs, price, currency, locations, order_url, updated_at)
-		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	st, err := tx.PrepareContext(ctx, `INSERT OR REPLACE INTO products(provider, region, code, name, family, specs, price, setup_fee, currency, locations, order_url, options, updated_at)
+		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		return err
 	}
@@ -28,7 +28,8 @@ func (s *Store) ReplaceProducts(ctx context.Context, providerID, region string, 
 	for _, p := range products {
 		specs, _ := json.Marshal(p.Specs)
 		locs, _ := json.Marshal(p.Locations)
-		if _, err := st.ExecContext(ctx, providerID, region, p.Code, p.Name, p.Family, string(specs), p.Price, p.Currency, string(locs), p.OrderURL, now); err != nil {
+		opts, _ := json.Marshal(p.Options)
+		if _, err := st.ExecContext(ctx, providerID, region, p.Code, p.Name, p.Family, string(specs), p.Price, p.SetupFee, p.Currency, string(locs), p.OrderURL, string(opts), now); err != nil {
 			return err
 		}
 	}
@@ -37,7 +38,7 @@ func (s *Store) ReplaceProducts(ctx context.Context, providerID, region string, 
 
 func (s *Store) ListProducts(ctx context.Context) ([]provider.Product, error) {
 	rows, err := s.db.QueryContext(ctx,
-		"SELECT provider, region, code, name, family, specs, price, currency, locations, order_url FROM products ORDER BY provider, region, name")
+		"SELECT provider, region, code, name, family, specs, price, setup_fee, currency, locations, order_url, options FROM products ORDER BY provider, region, name")
 	if err != nil {
 		return nil, err
 	}
@@ -45,12 +46,13 @@ func (s *Store) ListProducts(ctx context.Context) ([]provider.Product, error) {
 	out := []provider.Product{}
 	for rows.Next() {
 		var p provider.Product
-		var specs, locs string
-		if err := rows.Scan(&p.Provider, &p.Region, &p.Code, &p.Name, &p.Family, &specs, &p.Price, &p.Currency, &locs, &p.OrderURL); err != nil {
+		var specs, locs, opts string
+		if err := rows.Scan(&p.Provider, &p.Region, &p.Code, &p.Name, &p.Family, &specs, &p.Price, &p.SetupFee, &p.Currency, &locs, &p.OrderURL, &opts); err != nil {
 			return nil, err
 		}
 		_ = json.Unmarshal([]byte(specs), &p.Specs)
 		_ = json.Unmarshal([]byte(locs), &p.Locations)
+		_ = json.Unmarshal([]byte(opts), &p.Options)
 		out = append(out, p)
 	}
 	return out, rows.Err()

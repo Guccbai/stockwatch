@@ -28,7 +28,7 @@ func TestFormatAlert(t *testing.T) {
 		},
 	}
 	got := FormatAlert(a)
-	for _, want := range []string{"补货", "<b>KS-6</b>", "12.99 EUR/月", "🇫🇷 格拉沃利讷 (GRA)", "内存 128GB ECC 2400MHz · 硬盘 2×1TB NVMe · 软 RAID", "OVHcloud EU", "CPU AMD Epyc 7351P", "72 小时内交付", "&lt;买&gt;", "前往下单"} {
+	for _, want := range []string{"补货", "<b>KS-6</b>", "12.99 EUR/月起", "🇫🇷 格拉沃利讷 (GRA)", "内存 128GB ECC 2400MHz · 硬盘 2×1TB NVMe · 软 RAID", "OVHcloud EU", "CPU AMD Epyc 7351P", "72 小时内交付", "&lt;买&gt;", "前往下单"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("alert missing %q:\n%s", want, got)
 		}

@@ -124,23 +124,31 @@ function Detail({ target, code, focus }: { target: Target; code: string; focus: 
       const inStock = locs.filter((l) => isInStock(c.locations[l].status))
       return { ...c, spec: configSpecs(c.config, code), locs, inStock }
     })
-    // In-stock configurations first; keep the server's config order otherwise.
-    return rows.sort((a, b) => Number(b.inStock.length > 0) - Number(a.inStock.length > 0))
+    // In-stock configurations first, then cheapest first; unpriced ones last within each group.
+    const price = (c: (typeof rows)[number]) => c.price?.price ?? Infinity
+    return rows.sort((a, b) => Number(b.inStock.length > 0) - Number(a.inStock.length > 0) || price(a) - price(b))
   }, [data, code])
   if (isLoading || !data) return <Spinner className="mx-auto my-6" />
   if (configs.length === 0) return <p className="py-4 text-center text-xs text-zinc-500">暂无配置数据</p>
   const available = configs.filter((c) => c.inStock.length).length
+  const base = data.product?.price ?? 0
+  const currency = data.product?.currency ?? ''
+  const setupFee = data.product?.setupFee ?? 0
   return (
     <div>
       <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
         共 {configs.length} 种可选配置，{available} 种有货
+        {setupFee > 0 && <> · 安装费 {formatPrice(setupFee, currency)}（按月付费时一次性收取，预付 12/24 个月免收）</>}
       </p>
       <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
         {configs.map((c) => (
           <li
             key={c.config}
             title={c.spec.raw}
-            className={clsx('grid gap-x-4 gap-y-1 px-3 py-2 text-xs sm:grid-cols-[10.5rem_17rem_1fr]', !c.inStock.length && 'text-zinc-400 dark:text-zinc-500')}
+            className={clsx(
+              'grid gap-x-4 gap-y-1 px-3 py-2 text-xs sm:grid-cols-[minmax(8rem,10.5rem)_minmax(10rem,17rem)_minmax(0,1fr)_5.5rem]',
+              !c.inStock.length && 'text-zinc-400 dark:text-zinc-500',
+            )}
           >
             <span>
               <span className="mr-1 text-zinc-400 dark:text-zinc-500">内存</span>
@@ -149,6 +157,12 @@ function Detail({ target, code, focus }: { target: Target; code: string; focus: 
             <span>
               <span className="mr-1 text-zinc-400 dark:text-zinc-500">硬盘</span>
               {c.spec.storage || '—'}
+              {c.spec.system && (
+                <span className="block">
+                  <span className="mr-1 text-zinc-400 dark:text-zinc-500">系统盘</span>
+                  {c.spec.system}
+                </span>
+              )}
             </span>
             <span className="flex flex-wrap items-center gap-1">
               {c.inStock.map((l) => {
@@ -166,9 +180,50 @@ function Detail({ target, code, focus }: { target: Target; code: string; focus: 
               })}
               {!c.inStock.length && <span title={c.locs.map(locationName).join('\n')}>{c.locs.length} 个机房均无货</span>}
             </span>
+            <span
+              className="tabular-nums sm:text-right"
+              title={c.price ? `月付 ${formatPrice(c.price.price, currency)}，安装费 ${formatPrice(c.price.setupFee, currency)}` : '目录中找不到这个配置的价格'}
+            >
+              {c.price ? (
+                <>
+                  <span className={clsx('font-medium', c.inStock.length ? 'text-zinc-900 dark:text-zinc-100' : '')}>
+                    {formatPrice(c.price.price, currency)}
+                  </span>
+                  <span className="text-zinc-400">/月</span>
+                  {base > 0 && c.price.price - base > 0.005 && (
+                    <span className="block text-[11px] text-zinc-400">+{formatPrice(c.price.price - base, currency)}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-zinc-400">—</span>
+              )}
+            </span>
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+/** Price column: default-config monthly price, cheapest in-stock config, one-time setup fee. */
+function PriceCell({ p }: { p: ProductSummary }) {
+  if (!p.price) return <span className="text-zinc-400">—</span>
+  return (
+    <div className="text-right text-[11px] leading-5 whitespace-nowrap tabular-nums">
+      <div title="默认配置月价（不含税）">
+        <span className="text-sm text-zinc-900 dark:text-zinc-100">{formatPrice(p.price, p.currency)}</span>
+        <span className="ml-0.5 text-zinc-400">起</span>
+      </div>
+      {!!p.inStockPrice && p.inStockPrice !== p.price && (
+        <div className="text-emerald-600 dark:text-emerald-400" title="当前有货配置中的最低月价">
+          有货 {formatPrice(p.inStockPrice, p.currency)}
+        </div>
+      )}
+      {p.setupFee > 0 && (
+        <div className="text-zinc-400" title="按月付费时一次性收取；预付 12 或 24 个月免安装费（以官网为准）">
+          安装费 {formatPrice(p.setupFee, p.currency)}
+        </div>
+      )}
     </div>
   )
 }
@@ -350,7 +405,7 @@ export function Stock() {
                         <ProductTitle p={p} open={open} />
                       </button>
                       <div className="flex items-center gap-1">
-                        <span className="text-sm whitespace-nowrap tabular-nums">{formatPrice(p.price, p.currency)}</span>
+                        <PriceCell p={p} />
                         <RowActions p={p} onSubscribe={() => subscribe(p.code)} />
                       </div>
                     </div>
@@ -393,7 +448,9 @@ export function Stock() {
                           <td className="min-w-40 px-2.5 py-2.5">
                             <StockSummary p={p} focus={location} />
                           </td>
-                          <td className="px-3 py-2.5 text-right whitespace-nowrap tabular-nums">{formatPrice(p.price, p.currency)}</td>
+                          <td className="px-3 py-2.5">
+                            <PriceCell p={p} />
+                          </td>
                           <td className="px-2 py-2 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                             <RowActions p={p} onSubscribe={() => subscribe(p.code)} />
                           </td>
@@ -421,7 +478,7 @@ export function Stock() {
             <StatusDot status={s} /> {statusLabel[s]}
           </span>
         ))}
-        <span>×N = 该机房有货的配置数，后面是最快交付时间 · 配置列为默认配置，点击机型可查看全部可选配置</span>
+        <span>×N = 该机房有货的配置数，后面是最快交付时间 · 价格不含税，「起」为默认配置月价，点击机型可查看每种配置的价格</span>
       </div>
 
       <SubscriptionForm open={!!subInit} onClose={() => setSubInit(null)} initial={subInit ?? emptySubscription()} />

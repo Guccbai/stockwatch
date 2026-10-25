@@ -8,7 +8,47 @@
   {
    "planCode": "24adv01-v3",
    "invoiceName": "ADVANCE-1 | AMD EPYC 4244P",
-   "addonFamilies": [],
+   "addonFamilies": [
+    {
+     "name": "storage",
+     "default": "softraid-2x960nvme-pcie-gen4-24adv01-v3",
+     "mandatory": true,
+     "exclusive": true,
+     "addons": [
+      "softraid-2x960nvme-pcie-gen4-24adv01-v3",
+      "hybridsoftraid-2x960nvme-pcie-gen4-2x1920nvme-pcie-gen4-24adv01-v3",
+      "hybridsoftraid-2x960nvme-pcie-gen4-2x3840nvme-pcie-gen4-24adv01-v3",
+      "hybridsoftraid-2x960nvme-pcie-gen4-2x7680nvme-pcie-gen4-24adv01-v3",
+      "softraid-4x960nvme-pcie-gen4-24adv01-v3",
+      "softraid-4x3840nvme-pcie-gen4-24adv01-v3",
+      "softraid-4x1920nvme-pcie-gen4-24adv01-v3",
+      "softraid-4x7680nvme-pcie-gen4-24adv01-v3"
+     ]
+    },
+    {
+     "name": "memory",
+     "default": "ram-32g-on-die-ecc-5200-24adv01-v3",
+     "mandatory": true,
+     "exclusive": true,
+     "addons": [
+      "ram-128g-on-die-ecc-3600-24adv01-v3",
+      "ram-32g-on-die-ecc-5200-24adv01-v3",
+      "ram-64g-on-die-ecc-5200-24adv01-v3",
+      "ram-192g-on-die-ecc-3600-24adv01-v3"
+     ]
+    },
+    {
+     "name": "bandwidth",
+     "default": "bandwidth-3000-adv-gen3",
+     "mandatory": true,
+     "exclusive": true,
+     "addons": [
+      "bandwidth-3000-adv-gen3",
+      "bandwidth-4000-adv-gen3",
+      "bandwidth-5000-adv-gen3"
+     ]
+    }
+   ],
    "product": "24adv01",
    "pricingType": "rental",
    "consumptionConfiguration": null,
@@ -31,7 +71,7 @@
       "max": 1
      },
      "price": 8999000000,
-     "formattedPrice": "89.99 \u20ac",
+     "formattedPrice": "89.99 €",
      "tax": 1799800000,
      "mode": "default",
      "strategy": "tiered",
@@ -58,7 +98,7 @@
       "max": null
      },
      "price": 8999000000,
-     "formattedPrice": "89.99 \u20ac",
+     "formattedPrice": "89.99 €",
      "tax": 1799800000,
      "mode": "default",
      "strategy": "tiered",
@@ -85,7 +125,7 @@
       "max": 1
      },
      "price": 0,
-     "formattedPrice": "0.00 \u20ac",
+     "formattedPrice": "0.00 €",
      "tax": 0,
      "mode": "upfront12",
      "strategy": "tiered",
@@ -112,7 +152,7 @@
       "max": null
      },
      "price": 102589000000,
-     "formattedPrice": "1025.89 \u20ac",
+     "formattedPrice": "1025.89 €",
      "tax": 20517800000,
      "mode": "upfront12",
      "strategy": "tiered",
@@ -143,7 +183,7 @@
       "max": 1
      },
      "price": 0,
-     "formattedPrice": "0.00 \u20ac",
+     "formattedPrice": "0.00 €",
      "tax": 0,
      "mode": "upfront24",
      "strategy": "tiered",
@@ -170,7 +210,7 @@
       "max": null
      },
      "price": 205177000000,
-     "formattedPrice": "2051.77 \u20ac",
+     "formattedPrice": "2051.77 €",
      "tax": 41035400000,
      "mode": "upfront24",
      "strategy": "tiered",
@@ -228,7 +268,39 @@
   {
    "planCode": "24sk602",
    "invoiceName": "KS-6 | AMD Epyc 7351P",
-   "addonFamilies": [],
+   "addonFamilies": [
+    {
+     "name": "memory",
+     "default": "ram-128g-ecc-2400-24sk60",
+     "mandatory": true,
+     "exclusive": true,
+     "addons": [
+      "ram-256g-ecc-2400-24sk60",
+      "ram-128g-ecc-2400-24sk60"
+     ]
+    },
+    {
+     "name": "storage",
+     "default": "softraid-2x4000sa-24sk60",
+     "mandatory": true,
+     "exclusive": true,
+     "addons": [
+      "softraid-2x500nvme-24sk60",
+      "softraid-2x1000nvme-24sk60",
+      "softraid-2x4000sa-24sk60",
+      "softraid-2x8000sa-24sk60"
+     ]
+    },
+    {
+     "name": "bandwidth",
+     "default": "bandwidth-500-25sk",
+     "mandatory": true,
+     "exclusive": true,
+     "addons": [
+      "bandwidth-500-25sk"
+     ]
+    }
+   ],
    "product": "24sk60",
    "pricingType": "rental",
    "consumptionConfiguration": null,
@@ -251,7 +323,7 @@
       "max": 1
      },
      "price": 3899000000,
-     "formattedPrice": "38.99 \u20ac",
+     "formattedPrice": "38.99 €",
      "tax": 779800000,
      "mode": "default",
      "strategy": "tiered",
@@ -278,7 +350,7 @@
       "max": null
      },
      "price": 3899000000,
-     "formattedPrice": "38.99 \u20ac",
+     "formattedPrice": "38.99 €",
      "tax": 779800000,
      "mode": "default",
      "strategy": "tiered",
@@ -305,7 +377,7 @@
       "max": 1
      },
      "price": 0,
-     "formattedPrice": "0.00 \u20ac",
+     "formattedPrice": "0.00 €",
      "tax": 0,
      "mode": "upfront12",
      "strategy": "tiered",
@@ -332,7 +404,7 @@
       "max": null
      },
      "price": 44449000000,
-     "formattedPrice": "444.49 \u20ac",
+     "formattedPrice": "444.49 €",
      "tax": 8889800000,
      "mode": "upfront12",
      "strategy": "tiered",
@@ -363,7 +435,7 @@
       "max": 1
      },
      "price": 0,
-     "formattedPrice": "0.00 \u20ac",
+     "formattedPrice": "0.00 €",
      "tax": 0,
      "mode": "upfront24",
      "strategy": "tiered",
@@ -390,7 +462,7 @@
       "max": null
      },
      "price": 88897000000,
-     "formattedPrice": "888.97 \u20ac",
+     "formattedPrice": "888.97 €",
      "tax": 17779400000,
      "mode": "upfront24",
      "strategy": "tiered",
@@ -513,5 +585,2426 @@
    ]
   }
  ],
- "addons": []
+ "addons": [
+  {
+   "planCode": "bandwidth-3000-adv-gen3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 6,
+     "intervalUnit": "month",
+     "mode": "upfront6",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "bandwidth-4000-adv-gen3",
+   "pricings": [
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 20000000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity12",
+     "price": 20000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity24",
+     "price": 20000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity6",
+     "price": 20000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 240000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 480000000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 6,
+     "intervalUnit": "month",
+     "mode": "upfront6",
+     "price": 120000000000
+    }
+   ]
+  },
+  {
+   "planCode": "bandwidth-500-25sk",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity3",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity3",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 3,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity3",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront3",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront3",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 3,
+     "interval": 3,
+     "intervalUnit": "month",
+     "mode": "upfront3",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 6,
+     "intervalUnit": "month",
+     "mode": "upfront6",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "bandwidth-5000-adv-gen3",
+   "pricings": [
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 25000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity12",
+     "price": 25000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity24",
+     "price": 25000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "degressivity6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "degressivity6",
+     "price": 25000000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 300000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 600000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront6",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 6,
+     "interval": 6,
+     "intervalUnit": "month",
+     "mode": "upfront6",
+     "price": 150000000000
+    }
+   ]
+  },
+  {
+   "planCode": "hybridsoftraid-2x960nvme-pcie-gen4-2x1920nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 13200000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 158400000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 316800000000
+    }
+   ]
+  },
+  {
+   "planCode": "hybridsoftraid-2x960nvme-pcie-gen4-2x3840nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 22200000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 266400000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 532800000000
+    }
+   ]
+  },
+  {
+   "planCode": "hybridsoftraid-2x960nvme-pcie-gen4-2x7680nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 39600000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 475200000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 950400000000
+    }
+   ]
+  },
+  {
+   "planCode": "ram-128g-ecc-2400-24sk60",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "ram-128g-on-die-ecc-3600-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 13400000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 160800000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 321600000000
+    }
+   ]
+  },
+  {
+   "planCode": "ram-192g-on-die-ecc-3600-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 17800000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 213600000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 427200000000
+    }
+   ]
+  },
+  {
+   "planCode": "ram-256g-ecc-2400-24sk60",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 3200000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 36480000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 72960000000
+    }
+   ]
+  },
+  {
+   "planCode": "ram-32g-on-die-ecc-5200-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "ram-64g-on-die-ecc-5200-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 4200000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 50400000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 100800000000
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-2x1000nvme-24sk60",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 1500000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 17100000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 34200000000
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-2x4000sa-24sk60",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-2x500nvme-24sk60",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-2x8000sa-24sk60",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 1000000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 11400000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 22800000000
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-2x960nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 0
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-4x1920nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 18600000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 223200000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 446400000000
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-4x3840nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 36600000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 439200000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 878400000000
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-4x7680nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 71400000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 856800000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 1713600000000
+    }
+   ]
+  },
+  {
+   "planCode": "softraid-4x960nvme-pcie-gen4-24adv01-v3",
+   "pricings": [
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "default",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "interval": 1,
+     "intervalUnit": "month",
+     "mode": "default",
+     "price": 7800000000
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront12",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "interval": 12,
+     "intervalUnit": "month",
+     "mode": "upfront12",
+     "price": 93600000000
+    },
+    {
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "upgrade"
+     ],
+     "commitment": 0,
+     "interval": 0,
+     "intervalUnit": "none",
+     "mode": "upfront24",
+     "price": 0
+    },
+    {
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "interval": 24,
+     "intervalUnit": "month",
+     "mode": "upfront24",
+     "price": 187200000000
+    }
+   ]
+  }
+ ]
 }

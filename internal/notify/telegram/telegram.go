@@ -157,11 +157,20 @@ func (t *Telegram) send(ctx context.Context, token, chat, text string) error {
 
 // FormatAlert renders an alert as Telegram HTML.
 func FormatAlert(a notify.Alert) string {
+	var pricer provider.ConfigPricer
+	if p, err := provider.Get(a.Subscription.Provider); err == nil {
+		pricer, _ = p.(provider.ConfigPricer)
+	}
 	var restock, soldout []string
 	for _, e := range a.Events {
 		line := fmt.Sprintf("• <b>%s</b> %s", html.EscapeString(labels.Location(e.Location)), html.EscapeString(labels.Config(e.Config, e.ProductCode)))
 		if e.To.InStock() {
 			line += " · " + html.EscapeString(deliveryLabel(e.RawState))
+			if pricer != nil && a.Product != nil {
+				if cp, ok := pricer.ConfigPrice(*a.Product, e.Config); ok {
+					line += fmt.Sprintf(" · <b>%.2f %s/月</b>", cp.Price, html.EscapeString(a.Product.Currency))
+				}
+			}
 			restock = append(restock, line)
 		} else {
 			soldout = append(soldout, line)
@@ -192,7 +201,10 @@ func FormatAlert(a notify.Alert) string {
 			parts = append(parts, "硬盘 "+labels.Storage(sto))
 		}
 		if p.Price > 0 {
-			parts = append(parts, fmt.Sprintf("%.2f %s/月", p.Price, p.Currency))
+			parts = append(parts, fmt.Sprintf("%.2f %s/月起", p.Price, p.Currency))
+		}
+		if p.SetupFee > 0 {
+			parts = append(parts, fmt.Sprintf("安装费 %.2f %s", p.SetupFee, p.Currency))
 		}
 		if len(parts) > 0 {
 			b.WriteString(html.EscapeString(strings.Join(parts, " · ")) + "\n")

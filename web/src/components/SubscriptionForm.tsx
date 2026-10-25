@@ -150,7 +150,8 @@ export function SubscriptionForm({
             {product.specs?.cpu && <> · CPU {product.specs.cpu}</>}
             {product.specs?.memory && <> · 内存 {parseMemory(product.specs.memory)}</>}
             {product.specs?.storage && <> · 硬盘 {parseStorage(product.specs.storage)}</>}
-            {product.price > 0 && <> · {formatPrice(product.price, product.currency)}/月</>}
+            {product.price > 0 && <> · {formatPrice(product.price, product.currency)}/月起</>}
+            {product.setupFee > 0 && <> · 安装费 {formatPrice(product.setupFee, product.currency)}</>}
           </div>
         )}
 

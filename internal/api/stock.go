@@ -24,18 +24,21 @@ type locationSummary struct {
 }
 
 type productSummary struct {
-	Code       string                      `json:"code"`
-	Name       string                      `json:"name"`
-	Family     string                      `json:"family"`
-	Price      float64                     `json:"price"`
-	Currency   string                      `json:"currency"`
-	Specs      map[string]string           `json:"specs"`
-	OrderURL   string                      `json:"orderUrl"`
-	InCatalog  bool                        `json:"inCatalog"`
-	InStock    int                         `json:"inStock"`
-	Total      int                         `json:"total"`
-	LastChange time.Time                   `json:"lastChange"`
-	Locations  map[string]*locationSummary `json:"locations"`
+	Code     string  `json:"code"`
+	Name     string  `json:"name"`
+	Family   string  `json:"family"`
+	Price    float64 `json:"price"`    // default configuration
+	SetupFee float64 `json:"setupFee"` // one-time, without commitment
+	// InStockPrice is the cheapest configuration currently in stock (0 when none, or unpriced).
+	InStockPrice float64                     `json:"inStockPrice,omitempty"`
+	Currency     string                      `json:"currency"`
+	Specs        map[string]string           `json:"specs"`
+	OrderURL     string                      `json:"orderUrl"`
+	InCatalog    bool                        `json:"inCatalog"`
+	InStock      int                         `json:"inStock"`
+	Total        int                         `json:"total"`
+	LastChange   time.Time                   `json:"lastChange"`
+	Locations    map[string]*locationSummary `json:"locations"`
 }
 
 // deliveryHours orders OVH raw states such as "1H-high" < "24H" < "72H".
@@ -62,13 +65,32 @@ func better(a, b store.StockRow) bool {
 	return deliveryHours(a.RawState) < deliveryHours(b.RawState)
 }
 
-func summarize(rows []store.StockRow, products []provider.Product) ([]productSummary, []string) {
+// configPrice prices one configuration when the provider supports it.
+func configPrice(pricer provider.ConfigPricer, prod *provider.Product, config string) (provider.ConfigPrice, bool) {
+	if pricer == nil || prod == nil {
+		return provider.ConfigPrice{}, false
+	}
+	return pricer.ConfigPrice(*prod, config)
+}
+
+func summarize(rows []store.StockRow, products []provider.Product, pricer provider.ConfigPricer) ([]productSummary, []string) {
 	byCode := map[string]*productSummary{}
-	for _, p := range products {
+	catalog := map[string]*provider.Product{}
+	for i, p := range products {
+		catalog[p.Code] = &products[i]
 		byCode[p.Code] = &productSummary{
-			Code: p.Code, Name: p.Name, Family: p.Family, Price: p.Price, Currency: p.Currency,
+			Code: p.Code, Name: p.Name, Family: p.Family, Price: p.Price, SetupFee: p.SetupFee, Currency: p.Currency,
 			Specs: p.Specs, OrderURL: p.OrderURL, InCatalog: true, Locations: map[string]*locationSummary{},
 		}
+	}
+	priced := map[string]float64{} // config -> monthly price, computed once per config
+	priceOf := func(code, config string) (float64, bool) {
+		if v, ok := priced[config]; ok {
+			return v, v > 0
+		}
+		cp, ok := configPrice(pricer, catalog[code], config)
+		priced[config] = cp.Price
+		return cp.Price, ok
 	}
 	best := map[string]store.StockRow{} // code|location -> best row
 	locSet := map[string]bool{}
@@ -89,6 +111,9 @@ func summarize(rows []store.StockRow, products []provider.Product) ([]productSum
 		if r.Status.InStock() {
 			ls.InStock++
 			ps.InStock++
+			if v, ok := priceOf(r.ProductCode, r.Config); ok && (ps.InStockPrice == 0 || v < ps.InStockPrice) {
+				ps.InStockPrice = v
+			}
 		}
 		k := r.ProductCode + "|" + r.Location
 		if b, ok := best[k]; !ok || better(r, b) {
@@ -133,12 +158,13 @@ type slotState struct {
 }
 
 type configDetail struct {
-	Config    string               `json:"config"`
-	Extra     map[string]string    `json:"extra"`
-	Locations map[string]slotState `json:"locations"`
+	Config    string                `json:"config"`
+	Extra     map[string]string     `json:"extra"`
+	Price     *provider.ConfigPrice `json:"price"` // nil when the configuration couldn't be priced
+	Locations map[string]slotState  `json:"locations"`
 }
 
-func detail(rows []store.StockRow, code string) ([]configDetail, []string) {
+func detail(rows []store.StockRow, code string, prod *provider.Product, pricer provider.ConfigPricer) ([]configDetail, []string) {
 	byCfg := map[string]*configDetail{}
 	locSet := map[string]bool{}
 	for _, r := range rows {
@@ -148,6 +174,9 @@ func detail(rows []store.StockRow, code string) ([]configDetail, []string) {
 		c := byCfg[r.Config]
 		if c == nil {
 			c = &configDetail{Config: r.Config, Extra: r.Extra, Locations: map[string]slotState{}}
+			if cp, ok := configPrice(pricer, prod, r.Config); ok {
+				c.Price = &cp
+			}
 			byCfg[r.Config] = c
 		}
 		c.Locations[r.Location] = slotState{Status: r.Status, Raw: r.RawState, ChangedAt: r.ChangedAt}

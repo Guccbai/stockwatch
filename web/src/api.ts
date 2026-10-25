@@ -39,6 +39,7 @@ export interface Product {
   family: string
   specs: Record<string, string> | null
   price: number
+  setupFee: number
   currency: string
   locations: string[] | null
   orderUrl: string
@@ -55,7 +56,9 @@ export interface ProductSummary {
   code: string
   name: string
   family: string
-  price: number
+  price: number // default configuration
+  setupFee: number // one-time, without commitment
+  inStockPrice?: number // cheapest in-stock configuration
   currency: string
   specs: Record<string, string> | null
   orderUrl: string
@@ -79,9 +82,15 @@ export interface SlotState {
   changedAt: string
 }
 
+export interface ConfigPrice {
+  price: number
+  setupFee: number
+}
+
 export interface ConfigDetail {
   config: string
   extra: Record<string, string> | null
+  price: ConfigPrice | null // null when the configuration couldn't be priced
   locations: Record<string, SlotState>
 }
 

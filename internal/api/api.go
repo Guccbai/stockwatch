@@ -311,7 +311,7 @@ func (s *Server) stock(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	products, locs := summarize(s.Monitor.Slots(t), s.Monitor.Products(t.Provider, t.Region))
+	products, locs := summarize(s.Monitor.Slots(t), s.Monitor.Products(t.Provider, t.Region), pricerFor(t.Provider))
 	var poll *monitor.PollStatus
 	for _, st := range s.Monitor.Status() {
 		if st.Target == t {
@@ -321,6 +321,16 @@ func (s *Server) stock(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"target": t, "poll": poll, "locations": locs, "products": products})
 }
 
+// pricerFor returns the provider's per-configuration pricing, or nil when it has none.
+func pricerFor(providerID string) provider.ConfigPricer {
+	p, err := provider.Get(providerID)
+	if err != nil {
+		return nil
+	}
+	pricer, _ := p.(provider.ConfigPricer)
+	return pricer
+}
+
 func (s *Server) stockDetail(w http.ResponseWriter, r *http.Request) {
 	t, err := target(r)
 	if err != nil {
@@ -328,11 +338,11 @@ func (s *Server) stockDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	code := r.URL.Query().Get("product")
-	configs, locs := detail(s.Monitor.Slots(t), code)
 	var prod *provider.Product
 	if p, ok := s.Monitor.Product(t.Provider, t.Region, code); ok {
 		prod = &p
 	}
+	configs, locs := detail(s.Monitor.Slots(t), code, prod, pricerFor(t.Provider))
 	writeJSON(w, http.StatusOK, map[string]any{"target": t, "product": prod, "code": code, "locations": locs, "configs": configs})
 }
 

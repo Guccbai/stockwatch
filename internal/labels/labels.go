@@ -207,27 +207,47 @@ func Bandwidth(code string) string {
 }
 
 // Config renders an OVH fqn ("plan.ram-….softraid-…") as "内存 128GB ECC 2400MHz · 硬盘 2×1TB NVMe · 软 RAID".
+// STOR servers have a second disk group for the OS ("-system" suffix on Advance, plain on Rise), shown as 系统盘.
 // Configs without recognizable options are returned with the plan code stripped.
 func Config(config, productCode string) string {
 	c := strings.TrimPrefix(config, productCode+".")
-	var mem, sto string
+	var mem string
+	var disks []string
 	for p := range strings.SplitSeq(c, ".") {
 		switch {
 		case strings.HasPrefix(p, "ram-"):
 			mem = Memory(p)
 		case strings.Contains(p, "raid") || strings.Contains(p, "disk"):
-			sto = Storage(p)
+			disks = append(disks, p)
 		}
 	}
-	if mem == "" && sto == "" {
+	if mem == "" && len(disks) == 0 {
 		return strings.ReplaceAll(c, ".", " / ")
+	}
+	var sto, sys string
+	for _, d := range disks {
+		if strings.HasSuffix(d, "-system") {
+			sys = d
+		}
+	}
+	if sys == "" && len(disks) > 1 {
+		sys = disks[1]
+	}
+	for _, d := range disks {
+		if d != sys {
+			sto = d
+			break
+		}
 	}
 	var parts []string
 	if mem != "" {
 		parts = append(parts, "内存 "+mem)
 	}
 	if sto != "" {
-		parts = append(parts, "硬盘 "+sto)
+		parts = append(parts, "硬盘 "+Storage(sto))
+	}
+	if sys != "" {
+		parts = append(parts, "系统盘 "+Storage(sys))
 	}
 	return strings.Join(parts, " · ")
 }

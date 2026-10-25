@@ -35,10 +35,32 @@ type Product struct {
 	Name      string            `json:"name"`
 	Family    string            `json:"family"`
 	Specs     map[string]string `json:"specs"`
-	Price     float64           `json:"price"` // monthly, excluding tax
+	Price     float64           `json:"price"`    // monthly, excluding tax, for the default configuration
+	SetupFee  float64           `json:"setupFee"` // one-time installation fee without commitment, excluding tax
 	Currency  string            `json:"currency"`
 	Locations []string          `json:"locations"`
 	OrderURL  string            `json:"orderUrl"`
+	Options   []Option          `json:"options,omitempty"`
+}
+
+// Option is one orderable hardware choice (memory, storage, bandwidth…) priced on top of the base plan.
+type Option struct {
+	Family   string  `json:"family"`
+	Code     string  `json:"code"`
+	Price    float64 `json:"price"`    // monthly surcharge, excluding tax
+	SetupFee float64 `json:"setupFee"` // one-time surcharge, excluding tax
+}
+
+// ConfigPrice is what one concrete configuration costs (base plan plus its options).
+type ConfigPrice struct {
+	Price    float64 `json:"price"`
+	SetupFee float64 `json:"setupFee"`
+}
+
+// ConfigPricer is implemented by providers whose configurations are priced differently.
+// ok is false when the configuration can't be matched to catalog options.
+type ConfigPricer interface {
+	ConfigPrice(p Product, config string) (price ConfigPrice, ok bool)
 }
 
 // Availability is the stock state of one product configuration at one location.

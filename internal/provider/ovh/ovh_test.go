@@ -2,6 +2,7 @@ package ovh
 
 import (
 	"context"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -114,5 +115,53 @@ func TestFetchCatalog(t *testing.T) {
 	adv := byCode["24adv01-v3"]
 	if adv.Family != "Advance" || adv.Specs["cores"] != "6c/12t" {
 		t.Errorf("unexpected advance product: %+v", adv)
+	}
+	if ks.Price != 38.99 || ks.SetupFee != 38.99 {
+		t.Errorf("price/setup = %v/%v, want 38.99/38.99", ks.Price, ks.SetupFee)
+	}
+	if len(ks.Options) != 7 {
+		t.Errorf("got %d options, want 7 (2 memory + 4 storage + 1 bandwidth): %+v", len(ks.Options), ks.Options)
+	}
+
+	// Configuration prices: base 38.99 + memory option + storage option.
+	for config, want := range map[string]float64{
+		"24sk602.ram-128g-ecc-2400.softraid-2x4000sa":   38.99,
+		"24sk602.ram-128g-ecc-2400.softraid-2x1000nvme": 38.99 + 15,
+		"24sk602.ram-256g-ecc-2400.softraid-2x8000sa":   38.99 + 32 + 10,
+	} {
+		got, ok := p.ConfigPrice(ks, config)
+		if !ok || math.Abs(got.Price-want) > 1e-9 || got.SetupFee != 38.99 {
+			t.Errorf("ConfigPrice(%s) = %+v, %v; want %.2f", config, got, ok, want)
+		}
+	}
+	if _, ok := p.ConfigPrice(ks, "24sk602.ram-512g-ecc-2400.softraid-2x4000sa"); ok {
+		t.Error("expected no price for a memory size the catalog doesn't offer")
+	}
+}
+
+func TestMatchOptionFallbacks(t *testing.T) {
+	opts := []provider.Option{
+		{Family: "memory", Code: "ram-32g-ecc-2400-26sk10b-v1", Price: 0},
+		{Family: "memory", Code: "ram-64g-ecc-2400-26sk10b-v1", Price: 10},
+		{Family: "storage", Code: "softraid-0disk-24rise", Price: 0},
+		{Family: "storage", Code: "hybridsoftraid-2x4000sa-2x512nvme-24sys", Price: 20},
+	}
+	cases := []struct {
+		family, code, want string
+	}{
+		{"memory", "ram-32g-ecc-2133", "ram-32g-ecc-2400-26sk10b-v1"}, // same size, different speed
+		{"storage", "noraid-0", "softraid-0disk-24rise"},              // diskless
+		{"storage", "hybridsoftraid-2x4000sa-2x512nvme", "hybridsoftraid-2x4000sa-2x512nvme-24sys"},
+		{"storage", "hybridsoftraid-2x4000sa-2x500nvme", ""}, // different disks: no guess
+	}
+	for _, c := range cases {
+		got, ok := matchOption(opts, c.family, c.code)
+		if c.want == "" {
+			if ok {
+				t.Errorf("matchOption(%s) = %s, want no match", c.code, got.Code)
+			}
+		} else if !ok || got.Code != c.want {
+			t.Errorf("matchOption(%s) = %s, %v; want %s", c.code, got.Code, ok, c.want)
+		}
 	}
 }

@@ -116,19 +116,22 @@ export function parseBandwidth(code: string | undefined): string {
 }
 
 /** Splits an OVH fqn ("plan.ram-….softraid-…") into readable memory/storage; non-OVH configs come back as-is. */
-export function configSpecs(config: string, productCode: string): { memory: string; storage: string; raw: string } {
+export function configSpecs(config: string, productCode: string): { memory: string; storage: string; system: string; raw: string } {
   const raw = configLabel(config, productCode)
   const parts = config.startsWith(productCode + '.') ? config.slice(productCode.length + 1).split('.') : config.split('.')
   const mem = parts.find((p) => p.startsWith('ram-'))
-  const sto = parts.find((p) => /raid|disk/.test(p))
-  return { memory: parseMemory(mem), storage: parseStorage(sto), raw }
+  // STOR servers carry a second disk group for the OS (suffixed "-system" on Advance, plain on Rise).
+  const disks = parts.filter((p) => /raid|disk/.test(p))
+  const sys = disks.find((p) => p.endsWith('-system')) ?? (disks.length > 1 ? disks[1] : undefined)
+  const sto = disks.find((p) => p !== sys)
+  return { memory: parseMemory(mem), storage: parseStorage(sto), system: parseStorage(sys), raw }
 }
 
 /** One-line readable config, e.g. "内存 64GB DDR5 ECC · 硬盘 2×960GB NVMe". */
 export function configText(config: string, productCode: string) {
   const s = configSpecs(config, productCode)
   if (!s.memory && !s.storage) return s.raw
-  return [s.memory && `内存 ${s.memory}`, s.storage && `硬盘 ${s.storage}`].filter(Boolean).join(' · ')
+  return [s.memory && `内存 ${s.memory}`, s.storage && `硬盘 ${s.storage}`, s.system && `系统盘 ${s.system}`].filter(Boolean).join(' · ')
 }
 
 // --- remembered target ---
