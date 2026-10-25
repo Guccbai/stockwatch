@@ -1,6 +1,6 @@
 services:
   stockwatch:
-    image: stockwatch:latest
+    image: ghcr.io/guccbai/stockwatch:latest
     build: .
     restart: unless-stopped
     ports:

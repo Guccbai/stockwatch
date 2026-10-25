@@ -16,11 +16,26 @@
 
 ### Docker
 
+镜像发布在 GHCR，支持 `linux/amd64`、`linux/arm64`、`linux/arm/v7`：
+
 ```bash
-docker compose up -d --build
+docker run -d --name stockwatch -p 8080:8080 -v ./data:/data \
+  -e SW_ADMIN_PASSWORD=change-me-please ghcr.io/guccbai/stockwatch:latest
 ```
 
-打开 http://localhost:8080 ，用 `docker-compose.yml` 中的 `SW_ADMIN_PASSWORD` 登录，在「设置」中填写 Telegram Bot Token 和 Chat ID，点击「发送测试消息」确认。
+或使用仓库里的 `docker-compose.yml`（`docker compose up -d`；加 `--build` 则从源码构建）。
+
+打开 http://localhost:8080 ，用 `SW_ADMIN_PASSWORD` 登录，在「设置」中填写 Telegram Bot Token 和 Chat ID，点击「发送测试消息」确认。
+
+### 预编译二进制
+
+在 [Releases](https://github.com/Guccbai/stockwatch/releases) 下载对应平台的压缩包（Linux / macOS / Windows / FreeBSD，含 arm64 与 armv7），解压后运行：
+
+```bash
+SW_ADMIN_PASSWORD=your-password ./stockwatch
+```
+
+`checksums.txt` 里有各文件的 SHA-256。
 
 ### 从源码构建
 
@@ -84,6 +99,15 @@ type Provider interface {
 make dev       # 后端 :8080，启用演示服务商，密码默认 stockwatch
 make dev-web   # Vite 开发服务器，/api 代理到 :8080
 make test
+make dist      # 交叉编译所有平台的发布包到 dist/
+```
+
+### 发布
+
+推送 `v*` 标签即可，GitHub Actions 会运行测试、把各平台二进制发布到 Releases，并推送多架构镜像到 `ghcr.io/guccbai/stockwatch`（标签 `X.Y.Z`、`X.Y` 和 `latest`；带 `-` 的预发布版本不更新 `latest`）：
+
+```bash
+git tag v0.1.0 && git push origin v0.1.0
 ```
 
 ### 语言服务器（Claude Code）

@@ -1,7 +1,7 @@
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
-.PHONY: all web build test dev dev-web docker clean
+.PHONY: all web build test dev dev-web docker dist clean
 
 all: web build
 
@@ -22,7 +22,11 @@ dev-web:
 	cd web && npm run dev
 
 docker:
-	docker build -t stockwatch:$(VERSION) .
+	docker build --build-arg VERSION=$(VERSION) -t stockwatch:$(VERSION) .
+
+# Release archives for every platform into dist/ (what the release workflow publishes).
+dist: web
+	scripts/dist.sh $(VERSION)
 
 clean:
-	rm -rf bin web/dist/assets web/dist/index.html web/dist/favicon.svg
+	rm -rf bin dist web/dist/assets web/dist/index.html web/dist/favicon.svg
