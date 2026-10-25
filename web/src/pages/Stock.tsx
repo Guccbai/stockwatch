@@ -6,15 +6,16 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { api, type ProductSummary, type SubscriptionInput, type Target } from '../api'
 import { RegionPicker } from '../components/RegionPicker'
 import { emptySubscription, SubscriptionForm } from '../components/SubscriptionForm'
-import { Badge, Button, Card, Empty, Input, PageHeader, Select, Spinner, StatusBadge, StatusDot, Toggle } from '../components/ui'
+import { Badge, Card, Empty, Input, PageHeader, Select, Spinner, StatusDot, Toggle } from '../components/ui'
 import { useSettings, useTick } from '../hooks'
 import {
   configSpecs,
   deliveryLabel,
   formatPrice,
+  isInStock,
   loadTarget,
-  locationInfo,
   locationName,
+  locationShort,
   parseBandwidth,
   parseMemory,
   parseStorage,
@@ -26,27 +27,59 @@ import {
   timeAgo,
 } from '../lib'
 
-function Cell({ s, location }: { s?: ProductSummary['locations'][string]; location: string }) {
-  if (!s) return <span className="text-zinc-300 dark:text-zinc-700">·</span>
-  const label = `${locationName(location)} · ${statusLabel[s.status]} · ${s.inStock}/${s.total} 个配置有货${s.inStock ? ' · 最快 ' + deliveryLabel(s.raw) : ''}`
+const chipColor = {
+  available: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20',
+  low: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20',
+} as const
+
+/** In-stock datacenter pill: "🇫🇷 鲁贝 ×3 1小时". Amber means low stock; the full wording is in the tooltip. */
+function LocationChip({ code, status, raw, count, title }: { code: string; status: 'available' | 'low'; raw: string; count?: number; title?: string }) {
   return (
-    <span title={label} className="inline-flex items-center gap-1">
-      <StatusDot status={s.status} />
-      {s.inStock > 0 && <span className="text-[11px] text-zinc-500 tabular-nums dark:text-zinc-400">{s.inStock}</span>}
+    <span
+      title={title ?? locationName(code)}
+      className={clsx('inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium whitespace-nowrap ring-1 ring-inset', chipColor[status])}
+    >
+      {locationShort(code)}
+      {count !== undefined && <span className="tabular-nums opacity-70">×{count}</span>}
+      <span className="font-normal opacity-70">{/^\d+H/.test(raw) ? `${parseInt(raw)}小时` : deliveryLabel(raw)}</span>
     </span>
   )
 }
 
-function LocationHeader({ code }: { code: string }) {
-  const l = locationInfo(code)
+/** Summary of one product across datacenters: chips for in-stock locations, a muted count for the rest. */
+function StockSummary({ p, focus }: { p: ProductSummary; focus: string }) {
+  const codes = sortLocations(Object.keys(p.locations))
+  const inStock = codes.filter((l) => isInStock(p.locations[l].status))
+  const out = codes.length - inStock.length
+  if (codes.length === 0) return <span className="text-xs text-zinc-400">暂无数据</span>
   return (
-    <th className="px-2 py-2 text-left font-medium whitespace-nowrap" title={locationName(code)}>
-      <div className="text-zinc-700 dark:text-zinc-200">
-        {l.flag && <span className="mr-1" aria-hidden>{l.flag}</span>}
-        {l.city}
-      </div>
-      <div className="font-mono text-[10px] font-normal text-zinc-400">{code.toUpperCase()}</div>
-    </th>
+    <div className="flex flex-wrap items-center gap-1">
+      {inStock.map((l) => {
+        const s = p.locations[l]
+        return (
+          <span key={l} className={clsx(focus && focus !== l && 'opacity-40')}>
+            <LocationChip
+              code={l}
+              status={s.status as 'available' | 'low'}
+              raw={s.raw}
+              count={s.inStock}
+              title={`${locationName(l)} · ${s.inStock}/${s.total} 个配置有货 · 最快 ${deliveryLabel(s.raw)}`}
+            />
+          </span>
+        )
+      })}
+      {out > 0 && (
+        <span
+          className="text-[11px] whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+          title={codes
+            .filter((l) => !isInStock(p.locations[l].status))
+            .map(locationName)
+            .join('\n')}
+        >
+          {inStock.length ? `+${out} 个机房无货` : `${out} 个机房均无货`}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -63,9 +96,9 @@ function SpecList({ specs }: { specs: ProductSummary['specs'] }) {
     ],
   ]
   return (
-    <div className="space-y-0.5 text-xs whitespace-nowrap text-zinc-700 dark:text-zinc-300">
+    <div className="space-y-0.5 text-xs text-zinc-700 dark:text-zinc-300">
       {lines.map((line, i) => (
-        <div key={i} className="flex gap-3">
+        <div key={i} className="flex flex-wrap gap-x-3">
           {line
             .filter(([, v]) => v)
             .map(([k, v]) => (
@@ -80,48 +113,106 @@ function SpecList({ specs }: { specs: ProductSummary['specs'] }) {
   )
 }
 
-function Detail({ target, code }: { target: Target; code: string }) {
-  const { data, isLoading } = useQuery({ queryKey: ['stock-detail', target, code], queryFn: () => api.stockDetail(target, code) })
-  const locs = useMemo(() => sortLocations(data?.locations ?? []), [data])
+function Detail({ target, code, focus }: { target: Target; code: string; focus: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['stock-detail', target, code],
+    queryFn: () => api.stockDetail(target, code),
+  })
+  const configs = useMemo(() => {
+    const rows = (data?.configs ?? []).map((c) => {
+      const locs = sortLocations(Object.keys(c.locations))
+      const inStock = locs.filter((l) => isInStock(c.locations[l].status))
+      return { ...c, spec: configSpecs(c.config, code), locs, inStock }
+    })
+    // In-stock configurations first; keep the server's config order otherwise.
+    return rows.sort((a, b) => Number(b.inStock.length > 0) - Number(a.inStock.length > 0))
+  }, [data, code])
   if (isLoading || !data) return <Spinner className="mx-auto my-6" />
+  if (configs.length === 0) return <p className="py-4 text-center text-xs text-zinc-500">暂无配置数据</p>
+  const available = configs.filter((c) => c.inStock.length).length
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-xs">
-        <thead>
-          <tr className="text-zinc-500 dark:text-zinc-400">
-            <th className="px-3 py-2 text-left font-medium">内存</th>
-            <th className="px-3 py-2 text-left font-medium">硬盘</th>
-            {locs.map((l) => (
-              <LocationHeader key={l} code={l} />
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-          {data.configs.map((c) => {
-            const spec = configSpecs(c.config, code)
-            return (
-            <tr key={c.config} title={spec.raw}>
-              <td className="px-3 py-2 whitespace-nowrap text-zinc-700 dark:text-zinc-200">{spec.memory || spec.raw}</td>
-              <td className="px-3 py-2 whitespace-nowrap text-zinc-700 dark:text-zinc-200">{spec.storage || '—'}</td>
-              {locs.map((l) => {
-                const s = c.locations[l]
+    <div>
+      <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
+        共 {configs.length} 种可选配置，{available} 种有货
+      </p>
+      <ul className="divide-y divide-zinc-100 rounded-lg border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+        {configs.map((c) => (
+          <li
+            key={c.config}
+            title={c.spec.raw}
+            className={clsx('grid gap-x-4 gap-y-1 px-3 py-2 text-xs sm:grid-cols-[10.5rem_17rem_1fr]', !c.inStock.length && 'text-zinc-400 dark:text-zinc-500')}
+          >
+            <span>
+              <span className="mr-1 text-zinc-400 dark:text-zinc-500">内存</span>
+              {c.spec.memory || c.spec.raw}
+            </span>
+            <span>
+              <span className="mr-1 text-zinc-400 dark:text-zinc-500">硬盘</span>
+              {c.spec.storage || '—'}
+            </span>
+            <span className="flex flex-wrap items-center gap-1">
+              {c.inStock.map((l) => {
+                const st = c.locations[l]
                 return (
-                  <td key={l} className="px-2 py-2 whitespace-nowrap">
-                    {s ? (
-                      <span title={`更新于 ${timeAgo(s.changedAt)}`}>
-                        <StatusBadge status={s.status}>{s.status === 'available' || s.status === 'low' ? deliveryLabel(s.raw) : statusLabel[s.status]}</StatusBadge>
-                      </span>
-                    ) : (
-                      <span className="text-zinc-300 dark:text-zinc-700">—</span>
-                    )}
-                  </td>
+                  <span key={l} className={clsx(focus && focus !== l && 'opacity-40')}>
+                    <LocationChip
+                      code={l}
+                      status={st.status as 'available' | 'low'}
+                      raw={st.raw}
+                      title={`${locationName(l)} · ${deliveryLabel(st.raw)} · 更新于 ${timeAgo(st.changedAt)}`}
+                    />
+                  </span>
                 )
               })}
-            </tr>
-            )
-          })}
-        </tbody>
-      </table>
+              {!c.inStock.length && <span title={c.locs.map(locationName).join('\n')}>{c.locs.length} 个机房均无货</span>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function RowActions({ p, onSubscribe }: { p: ProductSummary; onSubscribe: () => void }) {
+  return (
+    <div className="flex justify-end gap-0.5 opacity-70 group-hover:opacity-100">
+      {p.orderUrl && (
+        <a
+          href={p.orderUrl}
+          target="_blank"
+          rel="noreferrer"
+          title="前往官网"
+          className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+        >
+          <ExternalLink className="size-4" />
+        </a>
+      )}
+      <button
+        type="button"
+        title="订阅补货通知"
+        onClick={onSubscribe}
+        className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-emerald-600 dark:hover:bg-zinc-700"
+      >
+        <BellPlus className="size-4" />
+      </button>
+    </div>
+  )
+}
+
+function ProductTitle({ p, open }: { p: ProductSummary; open: boolean }) {
+  return (
+    <div className="flex items-start gap-2">
+      {open ? <ChevronDown className="mt-1 size-3.5 shrink-0 text-zinc-400" /> : <ChevronRight className="mt-1 size-3.5 shrink-0 text-zinc-400" />}
+      <div>
+        <div className="flex items-center gap-1.5 font-medium whitespace-nowrap">
+          {p.name}
+          {p.inStock > 0 && <StatusDot status="available" pulse />}
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px] text-zinc-500">
+          {p.code}
+          {p.family && <Badge className="font-sans">{p.family}</Badge>}
+        </div>
+      </div>
     </div>
   )
 }
@@ -138,12 +229,16 @@ export function Stock() {
   const monitoredSet = useMemo(() => new Set(settings.data?.targets.map(targetKey)), [settings.data])
   const [q, setQ] = useState('')
   const [family, setFamily] = useState('')
+  const [location, setLocation] = useState('')
   const [onlyInStock, setOnlyInStock] = useState(false)
   const [onlyCatalog, setOnlyCatalog] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [subInit, setSubInit] = useState<SubscriptionInput | null>(null)
 
-  const { data, isLoading, error } = useQuery({ queryKey: ['stock', target], queryFn: () => api.stock(target) })
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['stock', target],
+    queryFn: () => api.stock(target),
+  })
 
   const families = useMemo(() => [...new Set((data?.products ?? []).map((p) => p.family).filter(Boolean))].sort(), [data])
   const rows = useMemo(() => {
@@ -152,13 +247,25 @@ export function Stock() {
       if (onlyCatalog && !p.inCatalog) return false
       if (onlyInStock && p.inStock === 0) return false
       if (family && p.family !== family) return false
-      if (needle && ![p.code, p.name, p.specs?.cpu ?? '', parseMemory(p.specs?.memory), parseStorage(p.specs?.storage)].some((s) => s.toLowerCase().includes(needle))) return false
+      if (location) {
+        const s = p.locations[location]
+        if (!s || (onlyInStock && !isInStock(s.status))) return false
+      }
+      if (
+        needle &&
+        ![p.code, p.name, p.specs?.cpu ?? '', parseMemory(p.specs?.memory), parseStorage(p.specs?.storage)].some((s) => s.toLowerCase().includes(needle))
+      )
+        return false
       return true
     })
-  }, [data, q, family, onlyInStock, onlyCatalog])
+  }, [data, q, family, location, onlyInStock, onlyCatalog])
 
-  // Only show location columns that the filtered rows actually have.
-  const cols = useMemo(() => sortLocations((data?.locations ?? []).filter((l) => rows.some((p) => p.locations[l]))), [data, rows])
+  const locations = useMemo(() => sortLocations(data?.locations ?? []), [data])
+  const subscribe = (code: string) =>
+    setSubInit({
+      ...emptySubscription(target.provider, target.region),
+      productCode: code,
+    })
 
   const monitored = settings.data?.targets.some((t) => targetKey(t) === targetKey(target)) || !!data?.poll
 
@@ -174,6 +281,7 @@ export function Stock() {
             onChange={(t) => {
               setExpanded(null)
               setFamily('')
+              setLocation('')
               setParams({ t: targetKey(t) })
             }}
           />
@@ -182,7 +290,11 @@ export function Stock() {
 
       {!monitored && !isLoading && (
         <div className="mb-4 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-          该区域尚未加入监控。在 <Link to="/settings" className="font-medium text-emerald-600 underline dark:text-emerald-400">设置</Link> 中勾选它，或直接为其中的机型创建订阅。
+          该区域尚未加入监控。在{' '}
+          <Link to="/settings" className="font-medium text-emerald-600 underline dark:text-emerald-400">
+            设置
+          </Link>{' '}
+          中勾选它，或直接为其中的机型创建订阅。
         </div>
       )}
 
@@ -200,6 +312,16 @@ export function Stock() {
               ))}
             </Select>
           </div>
+          <div className="w-44">
+            <Select value={location} onChange={(e) => setLocation(e.target.value)} aria-label="机房">
+              <option value="">全部机房</option>
+              {locations.map((l) => (
+                <option key={l} value={l}>
+                  {locationShort(l)} ({l.toUpperCase()})
+                </option>
+              ))}
+            </Select>
+          </div>
           <Toggle checked={onlyInStock} onChange={setOnlyInStock} label="仅有货" />
           <Toggle checked={onlyCatalog} onChange={setOnlyCatalog} label="仅公开目录" />
           <span className="ml-auto text-xs text-zinc-500 dark:text-zinc-400">{rows.length} 个结果</span>
@@ -212,87 +334,94 @@ export function Stock() {
             {(error as Error).message}
           </Empty>
         ) : rows.length === 0 ? (
-          <Empty title={data?.products.length ? '没有符合条件的机型' : '暂无数据'}>{data?.products.length ? '尝试调整筛选条件。' : '监控开始后首次轮询完成即可看到库存。'}</Empty>
+          <Empty title={data?.products.length ? '没有符合条件的机型' : '暂无数据'}>
+            {data?.products.length ? '尝试调整筛选条件。' : '监控开始后首次轮询完成即可看到库存。'}
+          </Empty>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-zinc-50/80 text-xs text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400">
-                <tr>
-                  <th className="sticky-col bg-zinc-50 px-4 py-2.5 text-left font-medium dark:bg-zinc-900">机型</th>
-                  <th className="px-3 py-2.5 text-left font-medium">配置</th>
-                  <th className="px-3 py-2.5 text-right font-medium">月付</th>
-                  {cols.map((l) => (
-                    <LocationHeader key={l} code={l} />
-                  ))}
-                  <th className="px-3 py-2.5" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                {rows.map((p) => {
-                  const open = expanded === p.code
-                  return (
-                    <Fragment key={p.code}>
-                      <tr className={clsx('group cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/40', open && 'bg-zinc-50 dark:bg-zinc-800/40')} onClick={() => setExpanded(open ? null : p.code)}>
-                        <td className="sticky-col bg-white px-4 py-2.5 group-hover:bg-zinc-50 dark:bg-zinc-900 dark:group-hover:bg-zinc-800">
-                          <div className="flex items-center gap-2">
-                            {open ? <ChevronDown className="size-3.5 text-zinc-400" /> : <ChevronRight className="size-3.5 text-zinc-400" />}
-                            <div>
-                              <div className="flex items-center gap-1.5 font-medium whitespace-nowrap">
-                                {p.name}
-                                {p.inStock > 0 && <StatusDot status="available" pulse />}
-                              </div>
-                              <div className="flex items-center gap-1.5 font-mono text-[11px] whitespace-nowrap text-zinc-500">
-                                {p.code}
-                                {p.family && <Badge className="font-sans">{p.family}</Badge>}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <SpecList specs={p.specs} />
-                        </td>
-                        <td className="px-3 py-2.5 text-right whitespace-nowrap tabular-nums">{formatPrice(p.price, p.currency)}</td>
-                        {cols.map((l) => (
-                          <td key={l} className="px-2 py-2.5">
-                            <Cell s={p.locations[l]} location={l} />
+          <>
+            {/* Phones: one card per product. */}
+            <ul className="divide-y divide-zinc-100 md:hidden dark:divide-zinc-800">
+              {rows.map((p) => {
+                const open = expanded === p.code
+                return (
+                  <li key={p.code} className={clsx('group space-y-2 px-4 py-3', open && 'bg-zinc-50 dark:bg-zinc-800/40')}>
+                    <div className="flex items-start justify-between gap-2">
+                      <button type="button" className="min-w-0 text-left" onClick={() => setExpanded(open ? null : p.code)}>
+                        <ProductTitle p={p} open={open} />
+                      </button>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm whitespace-nowrap tabular-nums">{formatPrice(p.price, p.currency)}</span>
+                        <RowActions p={p} onSubscribe={() => subscribe(p.code)} />
+                      </div>
+                    </div>
+                    <SpecList specs={p.specs} />
+                    <StockSummary p={p} focus={location} />
+                    {open && <Detail target={target} code={p.code} focus={location} />}
+                  </li>
+                )
+              })}
+            </ul>
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full text-sm">
+                <thead className="bg-zinc-50/80 text-xs text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400">
+                  <tr>
+                    <th className="px-4 py-2.5 text-left font-medium">机型</th>
+                    <th className="px-3 py-2.5 text-left font-medium">配置</th>
+                    <th className="px-3 py-2.5 text-left font-medium">库存</th>
+                    <th className="px-3 py-2.5 text-right font-medium">月付</th>
+                    <th className="w-0 px-3 py-2.5" />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  {rows.map((p) => {
+                    const open = expanded === p.code
+                    return (
+                      <Fragment key={p.code}>
+                        <tr
+                          className={clsx(
+                            'group cursor-pointer align-top transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/40',
+                            open && 'bg-zinc-50 dark:bg-zinc-800/40',
+                          )}
+                          onClick={() => setExpanded(open ? null : p.code)}
+                        >
+                          <td className="px-4 py-2.5">
+                            <ProductTitle p={p} open={open} />
                           </td>
-                        ))}
-                        <td className="px-3 py-2.5 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex justify-end gap-1 opacity-70 group-hover:opacity-100">
-                            {p.orderUrl && (
-                              <a href={p.orderUrl} target="_blank" rel="noreferrer" title="前往官网" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700">
-                                <ExternalLink className="size-4" />
-                              </a>
-                            )}
-                            <Button size="sm" variant="ghost" onClick={() => setSubInit({ ...emptySubscription(target.provider, target.region), productCode: p.code })}>
-                              <BellPlus className="size-4" /> 订阅
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      {open && (
-                        <tr>
-                          <td colSpan={cols.length + 4} className="bg-zinc-50/60 px-4 py-3 dark:bg-zinc-950/40">
-                            <Detail target={target} code={p.code} />
+                          <td className="min-w-44 px-2.5 py-2.5">
+                            <SpecList specs={p.specs} />
+                          </td>
+                          <td className="min-w-40 px-2.5 py-2.5">
+                            <StockSummary p={p} focus={location} />
+                          </td>
+                          <td className="px-3 py-2.5 text-right whitespace-nowrap tabular-nums">{formatPrice(p.price, p.currency)}</td>
+                          <td className="px-2 py-2 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                            <RowActions p={p} onSubscribe={() => subscribe(p.code)} />
                           </td>
                         </tr>
-                      )}
-                    </Fragment>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                        {open && (
+                          <tr>
+                            <td colSpan={5} className="bg-zinc-50/60 px-4 py-3 dark:bg-zinc-950/40">
+                              <Detail target={target} code={p.code} focus={location} />
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </Card>
 
       <div className="mt-3 flex flex-wrap gap-4 text-xs text-zinc-500 dark:text-zinc-400">
-        {(['available', 'low', 'unavailable', 'unknown'] as const).map((s) => (
+        {(['available', 'low'] as const).map((s) => (
           <span key={s} className="flex items-center gap-1.5">
             <StatusDot status={s} /> {statusLabel[s]}
           </span>
         ))}
-        <span>数字 = 该机房有货的配置数 · 默认配置仅供参考，展开可查看全部可选配置</span>
+        <span>×N = 该机房有货的配置数，后面是最快交付时间 · 配置列为默认配置，点击机型可查看全部可选配置</span>
       </div>
 
       <SubscriptionForm open={!!subInit} onClose={() => setSubInit(null)} initial={subInit ?? emptySubscription()} />
