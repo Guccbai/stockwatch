@@ -15,14 +15,28 @@ import (
 // "ram-32g-ecc-2133-24sk10"), so options are matched by prefix, falling back to an unambiguous
 // match on memory size or disk layout when the two feeds disagree on details (≈1% of slots).
 func (p *Provider) ConfigPrice(prod provider.Product, config string) (provider.ConfigPrice, bool) {
-	if prod.Price <= 0 || len(prod.Options) == 0 {
+	if prod.Price <= 0 {
+		return provider.ConfigPrice{}, false
+	}
+	opts, ok := configOptions(prod, config)
+	if !ok {
 		return provider.ConfigPrice{}, false
 	}
 	out := provider.ConfigPrice{Price: prod.Price, SetupFee: prod.SetupFee}
-	add := func(o provider.Option) {
+	for _, o := range opts {
 		out.Price += o.Price
 		out.SetupFee += o.SetupFee
 	}
+	out.Price, out.SetupFee = cents(out.Price), cents(out.SetupFee)
+	return out, true
+}
+
+// configOptions resolves the catalog options an fqn is made of, plus the default bandwidth.
+func configOptions(prod provider.Product, config string) ([]provider.Option, bool) {
+	if len(prod.Options) == 0 {
+		return nil, false
+	}
+	var out []provider.Option
 	var matched int
 	seenStorage := false
 	for part := range strings.SplitSeq(strings.TrimPrefix(config, prod.Code+"."), ".") {
@@ -41,23 +55,22 @@ func (p *Provider) ConfigPrice(prod provider.Product, config string) (provider.C
 		}
 		o, ok := matchOption(prod.Options, family, part)
 		if !ok {
-			return provider.ConfigPrice{}, false
+			return nil, false
 		}
-		add(o)
+		out = append(out, o)
 		matched++
 	}
 	if matched == 0 {
-		return provider.ConfigPrice{}, false
+		return nil, false
 	}
 	// Bandwidth isn't part of the fqn; the default option is what an order gets unless upgraded.
 	if bw := prod.Specs["bandwidth"]; bw != "" {
 		for _, o := range prod.Options {
 			if o.Family == "bandwidth" && o.Code == bw {
-				add(o)
+				out = append(out, o)
 			}
 		}
 	}
-	out.Price, out.SetupFee = cents(out.Price), cents(out.SetupFee)
 	return out, true
 }
 

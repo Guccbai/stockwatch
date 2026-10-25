@@ -54,6 +54,7 @@ func (s *Server) Handler() http.Handler {
 			r.Get("/overview", s.overview)
 			r.Get("/stock", s.stock)
 			r.Get("/stock/detail", s.stockDetail)
+			r.Get("/order", s.order)
 			r.Get("/subscriptions", s.listSubs)
 			r.Post("/subscriptions", s.createSub)
 			r.Put("/subscriptions/{id}", s.updateSub)
@@ -344,6 +345,47 @@ func (s *Server) stockDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	configs, locs := detail(s.Monitor.Slots(t), code, prod, pricerFor(t.Provider))
 	writeJSON(w, http.StatusOK, map[string]any{"target": t, "product": prod, "code": code, "locations": locs, "configs": configs})
+}
+
+// order redirects to the provider's pre-filled order page for a product. Without config it picks
+// the cheapest configuration in stock (at location, or anywhere when location is empty). When no
+// pre-filled link can be built it falls back to the provider's storefront for the region.
+func (s *Server) order(w http.ResponseWriter, r *http.Request) {
+	t, err := target(r)
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	q := r.URL.Query()
+	code, location, config := q.Get("product"), q.Get("location"), q.Get("config")
+	prod, ok := s.Monitor.Product(t.Provider, t.Region, code)
+	if !ok {
+		// Slots for plans missing from the public catalog: nothing to pre-fill, send to the storefront.
+		for _, p := range s.Monitor.Products(t.Provider, t.Region) {
+			if p.OrderURL != "" {
+				http.Redirect(w, r, p.OrderURL, http.StatusFound)
+				return
+			}
+		}
+		writeErr(w, http.StatusNotFound, "unknown product")
+		return
+	}
+	if config == "" {
+		config, location = cheapestInStock(s.Monitor.Slots(t), &prod, location, pricerFor(t.Provider))
+	}
+	if p, err := provider.Get(t.Provider); err == nil {
+		if linker, ok := p.(provider.OrderLinker); ok && config != "" {
+			if u, ok := linker.OrderURL(prod, config, location); ok {
+				http.Redirect(w, r, u, http.StatusFound)
+				return
+			}
+		}
+	}
+	if prod.OrderURL == "" {
+		writeErr(w, http.StatusNotFound, "no order link for this product")
+		return
+	}
+	http.Redirect(w, r, prod.OrderURL, http.StatusFound)
 }
 
 func (s *Server) listSubs(w http.ResponseWriter, r *http.Request) {

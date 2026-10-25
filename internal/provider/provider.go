@@ -63,6 +63,12 @@ type ConfigPricer interface {
 	ConfigPrice(p Product, config string) (price ConfigPrice, ok bool)
 }
 
+// OrderLinker is implemented by providers that can deep-link to an order pre-filled with one
+// configuration at one location. ok is false when no such link can be built.
+type OrderLinker interface {
+	OrderURL(p Product, config, location string) (url string, ok bool)
+}
+
 // Availability is the stock state of one product configuration at one location.
 type Availability struct {
 	Provider    string            `json:"provider"`

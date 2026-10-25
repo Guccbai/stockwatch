@@ -165,3 +165,36 @@ func TestMatchOptionFallbacks(t *testing.T) {
 		}
 	}
 }
+
+func TestOrderURL(t *testing.T) {
+	srv := fixtureServer(t)
+	p := New(5 * time.Second)
+	p.baseOverride = srv.URL
+	prods, err := p.FetchCatalog(context.Background(), "eu")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ks provider.Product
+	for _, pr := range prods {
+		if pr.Code == "24sk602" {
+			ks = pr
+		}
+	}
+	got, ok := p.OrderURL(ks, "24sk602.ram-256g-ecc-2400.softraid-2x8000sa", "gra")
+	// Same link that was checked by hand against order.eu.ovhcloud.com (cart filled with these items).
+	want := "https://order.eu.ovhcloud.com/fr/express/#/express/review?products=" +
+		"~(~(planCode~'24sk602~productId~'eco~pricingMode~'default~quantity~1~duration~'P1M" +
+		"~configuration~(~(label~'dedicated_datacenter~value~'gra)~(label~'dedicated_os~value~'none_64.en))" +
+		"~option~(~(planCode~'ram-256g-ecc-2400-24sk60~duration~'P1M~pricingMode~'default~quantity~1)" +
+		"~(planCode~'softraid-2x8000sa-24sk60~duration~'P1M~pricingMode~'default~quantity~1)" +
+		"~(planCode~'bandwidth-500-25sk~duration~'P1M~pricingMode~'default~quantity~1))))"
+	if !ok || got != want {
+		t.Errorf("OrderURL =\n%s\nwant\n%s", got, want)
+	}
+	if _, ok := p.OrderURL(ks, "24sk602.ram-512g-ecc-2400.softraid-2x4000sa", "gra"); ok {
+		t.Error("expected no link for an unmatched configuration")
+	}
+	if s := jsurlString("a b$é"); s != "a*20b!*e9" {
+		t.Errorf("jsurlString = %q", s)
+	}
+}

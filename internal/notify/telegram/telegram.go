@@ -158,9 +158,16 @@ func (t *Telegram) send(ctx context.Context, token, chat, text string) error {
 // FormatAlert renders an alert as Telegram HTML.
 func FormatAlert(a notify.Alert) string {
 	var pricer provider.ConfigPricer
+	var linker provider.OrderLinker
 	if p, err := provider.Get(a.Subscription.Provider); err == nil {
 		pricer, _ = p.(provider.ConfigPricer)
+		linker, _ = p.(provider.OrderLinker)
 	}
+	orderURL := "" // pre-filled order for the first restocked slot, else the product page
+	if a.Product != nil {
+		orderURL = a.Product.OrderURL
+	}
+	linked := false
 	var restock, soldout []string
 	for _, e := range a.Events {
 		line := fmt.Sprintf("• <b>%s</b> %s", html.EscapeString(labels.Location(e.Location)), html.EscapeString(labels.Config(e.Config, e.ProductCode)))
@@ -169,6 +176,11 @@ func FormatAlert(a notify.Alert) string {
 			if pricer != nil && a.Product != nil {
 				if cp, ok := pricer.ConfigPrice(*a.Product, e.Config); ok {
 					line += fmt.Sprintf(" · <b>%.2f %s/月</b>", cp.Price, html.EscapeString(a.Product.Currency))
+				}
+			}
+			if !linked && linker != nil && a.Product != nil {
+				if u, ok := linker.OrderURL(*a.Product, e.Config, e.Location); ok {
+					orderURL, linked = u, true
 				}
 			}
 			restock = append(restock, line)
@@ -228,8 +240,12 @@ func FormatAlert(a notify.Alert) string {
 	if a.Subscription.Note != "" {
 		b.WriteString("\n📝 " + html.EscapeString(a.Subscription.Note) + "\n")
 	}
-	if a.Product != nil && a.Product.OrderURL != "" && len(restock) > 0 {
-		fmt.Fprintf(&b, "\n<a href=\"%s\">前往下单 →</a>", html.EscapeString(a.Product.OrderURL))
+	if orderURL != "" && len(restock) > 0 {
+		label := "前往下单 →"
+		if linked {
+			label = "前往下单（已预选第一个有货配置）→"
+		}
+		fmt.Fprintf(&b, "\n<a href=\"%s\">%s</a>", html.EscapeString(orderURL), label)
 	}
 	return b.String()
 }

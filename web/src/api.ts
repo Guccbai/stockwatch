@@ -228,6 +228,9 @@ export const api = {
   overview: () => request<Overview>('GET', '/overview'),
   stock: (t: Target) => request<StockResponse>('GET', '/stock' + qs({ ...t })),
   stockDetail: (t: Target, product: string) => request<StockDetail>('GET', '/stock/detail' + qs({ ...t, product })),
+  /** Link that redirects to the provider's pre-filled order page: the given config at location, else the
+   * cheapest one in stock there (or anywhere without location); the storefront when nothing can be pre-filled. */
+  orderUrl: (t: Target, product: string, location?: string, config?: string) => '/api/order' + qs({ ...t, product, location, config }),
 
   subscriptions: () => request<Subscription[]>('GET', '/subscriptions'),
   createSubscription: (s: SubscriptionInput) => request<Subscription>('POST', '/subscriptions', s),

@@ -151,6 +151,22 @@ func summarize(rows []store.StockRow, products []provider.Product, pricer provid
 	return out, locs
 }
 
+// cheapestInStock picks the in-stock slot of a product to order: the cheapest priced configuration,
+// else the first in stock. location "" means any location. Empty config when nothing is in stock.
+func cheapestInStock(rows []store.StockRow, prod *provider.Product, location string, pricer provider.ConfigPricer) (config, loc string) {
+	bestPrice := 0.0
+	for _, r := range rows {
+		if r.ProductCode != prod.Code || location != "" && r.Location != location || !r.Status.InStock() {
+			continue
+		}
+		cp, ok := configPrice(pricer, prod, r.Config)
+		if config == "" || ok && (bestPrice == 0 || cp.Price < bestPrice) {
+			config, loc, bestPrice = r.Config, r.Location, cp.Price
+		}
+	}
+	return config, loc
+}
+
 type slotState struct {
 	Status    provider.StockStatus `json:"status"`
 	Raw       string               `json:"raw"`

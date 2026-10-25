@@ -32,22 +32,49 @@ const chipColor = {
   low: 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20',
 } as const
 
-/** In-stock datacenter pill: "🇫🇷 鲁贝 ×3 1小时". Amber means low stock; the full wording is in the tooltip. */
-function LocationChip({ code, status, raw, count, title }: { code: string; status: 'available' | 'low'; raw: string; count?: number; title?: string }) {
-  return (
-    <span
-      title={title ?? locationName(code)}
-      className={clsx('inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium whitespace-nowrap ring-1 ring-inset', chipColor[status])}
-    >
+/** In-stock datacenter pill: "🇫🇷 鲁贝 ×3 1小时". Amber means low stock; the full wording is in the tooltip.
+ * With href it opens the provider's pre-filled order page in a new tab. */
+function LocationChip({
+  code,
+  status,
+  raw,
+  count,
+  title,
+  href,
+}: {
+  code: string
+  status: 'available' | 'low'
+  raw: string
+  count?: number
+  title?: string
+  href?: string
+}) {
+  const className = clsx(
+    'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium whitespace-nowrap ring-1 ring-inset',
+    chipColor[status],
+    href && 'transition hover:ring-2 hover:brightness-95 dark:hover:brightness-125',
+  )
+  const body = (
+    <>
       {locationShort(code)}
       {count !== undefined && <span className="tabular-nums opacity-70">×{count}</span>}
       <span className="font-normal opacity-70">{/^\d+H/.test(raw) ? `${parseInt(raw)}小时` : deliveryLabel(raw)}</span>
+    </>
+  )
+  const tip = title ?? locationName(code)
+  return href ? (
+    <a href={href} target="_blank" rel="noreferrer" title={`${tip}\n点击前往下单`} className={className} onClick={(e) => e.stopPropagation()}>
+      {body}
+    </a>
+  ) : (
+    <span title={tip} className={className}>
+      {body}
     </span>
   )
 }
 
 /** Summary of one product across datacenters: chips for in-stock locations, a muted count for the rest. */
-function StockSummary({ p, focus }: { p: ProductSummary; focus: string }) {
+function StockSummary({ p, focus, target }: { p: ProductSummary; focus: string; target: Target }) {
   const codes = sortLocations(Object.keys(p.locations))
   const inStock = codes.filter((l) => isInStock(p.locations[l].status))
   const out = codes.length - inStock.length
@@ -63,7 +90,8 @@ function StockSummary({ p, focus }: { p: ProductSummary; focus: string }) {
               status={s.status as 'available' | 'low'}
               raw={s.raw}
               count={s.inStock}
-              title={`${locationName(l)} · ${s.inStock}/${s.total} 个配置有货 · 最快 ${deliveryLabel(s.raw)}`}
+              title={`${locationName(l)} · ${s.inStock}/${s.total} 个配置有货 · 最快 ${deliveryLabel(s.raw)}\n将预选该机房最便宜的有货配置`}
+              href={api.orderUrl(target, p.code, l)}
             />
           </span>
         )
@@ -174,6 +202,7 @@ function Detail({ target, code, focus }: { target: Target; code: string; focus: 
                       status={st.status as 'available' | 'low'}
                       raw={st.raw}
                       title={`${locationName(l)} · ${deliveryLabel(st.raw)} · 更新于 ${timeAgo(st.changedAt)}`}
+                      href={api.orderUrl(target, code, l, c.config)}
                     />
                   </span>
                 )
@@ -228,16 +257,17 @@ function PriceCell({ p }: { p: ProductSummary }) {
   )
 }
 
-function RowActions({ p, onSubscribe }: { p: ProductSummary; onSubscribe: () => void }) {
+function RowActions({ p, target, onSubscribe }: { p: ProductSummary; target: Target; onSubscribe: () => void }) {
   return (
     <div className="flex justify-end gap-0.5 opacity-70 group-hover:opacity-100">
       {p.orderUrl && (
         <a
-          href={p.orderUrl}
+          href={api.orderUrl(target, p.code)}
           target="_blank"
           rel="noreferrer"
-          title="前往官网"
+          title={p.inStock > 0 ? '前往下单（预选全区最便宜的有货配置）' : '前往官网（当前无货）'}
           className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+          onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink className="size-4" />
         </a>
@@ -406,11 +436,11 @@ export function Stock() {
                       </button>
                       <div className="flex items-center gap-1">
                         <PriceCell p={p} />
-                        <RowActions p={p} onSubscribe={() => subscribe(p.code)} />
+                        <RowActions p={p} target={target} onSubscribe={() => subscribe(p.code)} />
                       </div>
                     </div>
                     <SpecList specs={p.specs} />
-                    <StockSummary p={p} focus={location} />
+                    <StockSummary p={p} focus={location} target={target} />
                     {open && <Detail target={target} code={p.code} focus={location} />}
                   </li>
                 )
@@ -446,13 +476,13 @@ export function Stock() {
                             <SpecList specs={p.specs} />
                           </td>
                           <td className="min-w-40 px-2.5 py-2.5">
-                            <StockSummary p={p} focus={location} />
+                            <StockSummary p={p} focus={location} target={target} />
                           </td>
                           <td className="px-3 py-2.5">
                             <PriceCell p={p} />
                           </td>
                           <td className="px-2 py-2 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                            <RowActions p={p} onSubscribe={() => subscribe(p.code)} />
+                            <RowActions p={p} target={target} onSubscribe={() => subscribe(p.code)} />
                           </td>
                         </tr>
                         {open && (
@@ -478,7 +508,10 @@ export function Stock() {
             <StatusDot status={s} /> {statusLabel[s]}
           </span>
         ))}
-        <span>×N = 该机房有货的配置数，后面是最快交付时间 · 价格不含税，「起」为默认配置月价，点击机型可查看每种配置的价格</span>
+        <span>
+          ×N = 该机房有货的配置数，后面是最快交付时间 · 价格不含税，「起」为默认配置月价，点击机型可查看每种配置的价格 · 点击有货标签直接打开 OVH
+          下单页（已预选机房和配置）
+        </span>
       </div>
 
       <SubscriptionForm open={!!subInit} onClose={() => setSubInit(null)} initial={subInit ?? emptySubscription()} />

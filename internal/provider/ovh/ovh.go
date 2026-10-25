@@ -20,12 +20,13 @@ type regionInfo struct {
 	APIBase    string
 	Subsidiary string
 	OrderURL   string
+	ExpressURL string // OVH's "express order" app, which accepts a pre-filled cart (see OrderURL)
 }
 
 var regions = []regionInfo{
-	{provider.Region{ID: "eu", Name: "欧洲", Currency: "EUR"}, "https://eu.api.ovh.com/1.0", "FR", "https://eco.ovhcloud.com/fr/"},
-	{provider.Region{ID: "ca", Name: "加拿大", Currency: "CAD"}, "https://ca.api.ovh.com/1.0", "CA", "https://eco.ovhcloud.com/en-ca/"},
-	{provider.Region{ID: "us", Name: "美国", Currency: "USD"}, "https://api.us.ovhcloud.com/1.0", "US", "https://us.ovhcloud.com/bare-metal/"},
+	{provider.Region{ID: "eu", Name: "欧洲", Currency: "EUR"}, "https://eu.api.ovh.com/1.0", "FR", "https://eco.ovhcloud.com/fr/", "https://order.eu.ovhcloud.com/fr/express/"},
+	{provider.Region{ID: "ca", Name: "加拿大", Currency: "CAD"}, "https://ca.api.ovh.com/1.0", "CA", "https://eco.ovhcloud.com/en-ca/", "https://order.ca.ovhcloud.com/en/express/"},
+	{provider.Region{ID: "us", Name: "美国", Currency: "USD"}, "https://api.us.ovhcloud.com/1.0", "US", "https://eco.us.ovhcloud.com/", "https://order.us.ovhcloud.com/en/express/"},
 }
 
 type Provider struct {
