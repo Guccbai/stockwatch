@@ -54,31 +54,60 @@ function Events() {
         <Empty icon={<HistoryIcon className="size-8" />} title="暂无记录">首次轮询只记录基线，之后的状态变化会出现在这里。</Empty>
       ) : (
         <>
-          <div className="overflow-x-auto">
+          {/* Phones: one card per event. */}
+          <ul className="divide-y divide-zinc-100 md:hidden dark:divide-zinc-800">
+            {events.map((e) => (
+              <li key={e.id} className="space-y-1.5 px-4 py-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex min-w-0 items-center gap-1.5">
+                    <StatusBadge status={e.from} />
+                    <ArrowRight className="size-3 shrink-0 text-zinc-400" />
+                    <StatusBadge status={e.to}>{isInStock(e.to) ? deliveryLabel(e.rawState) : undefined}</StatusBadge>
+                  </span>
+                  <time className="shrink-0 text-xs text-zinc-400 tabular-nums" title={formatTime(e.at)}>
+                    {timeAgo(e.at)}
+                  </time>
+                </div>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                  <span className="font-mono font-medium">{e.productCode}</span>
+                  <span className="text-zinc-600 dark:text-zinc-300" title={locationName(e.location)}>
+                    {locationShort(e.location)}
+                  </span>
+                  <Badge>{targetName(e)}</Badge>
+                </div>
+                <div className="text-xs text-zinc-500 dark:text-zinc-400" title={e.config}>
+                  {configText(e.config, e.productCode)}
+                </div>
+                <div className="text-[11px] text-zinc-400 tabular-nums">{formatTime(e.at)}</div>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-sm">
               <thead className="bg-zinc-50/80 text-xs text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400">
                 <tr>
                   <th className="px-4 py-2.5 text-left font-medium">时间</th>
-                  <th className="px-3 py-2.5 text-left font-medium">机型</th>
-                  <th className="px-3 py-2.5 text-left font-medium">机房</th>
+                  <th className="px-3 py-2.5 text-left font-medium">机型 / 机房</th>
                   <th className="px-3 py-2.5 text-left font-medium">配置</th>
                   <th className="px-3 py-2.5 text-left font-medium">变化</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {events.map((e) => (
-                  <tr key={e.id}>
+                  <tr key={e.id} className="align-top">
                     <td className="px-4 py-2.5 text-xs whitespace-nowrap text-zinc-500 tabular-nums dark:text-zinc-400" title={timeAgo(e.at)}>
                       {formatTime(e.at)}
                     </td>
-                    <td className="px-3 py-2.5 whitespace-nowrap">
-                      <span className="font-mono text-xs font-medium">{e.productCode}</span>
-                      <Badge className="ml-1.5">{targetName(e)}</Badge>
+                    <td className="px-3 py-2.5">
+                      <div className="font-mono text-xs font-medium whitespace-nowrap">{e.productCode}</div>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
+                        <span className="whitespace-nowrap text-zinc-600 dark:text-zinc-300" title={locationName(e.location)}>
+                          {locationShort(e.location)}
+                        </span>
+                        <Badge>{targetName(e)}</Badge>
+                      </div>
                     </td>
-                    <td className="px-3 py-2.5 text-xs whitespace-nowrap" title={locationName(e.location)}>
-                      {locationShort(e.location)}
-                    </td>
-                    <td className="max-w-96 truncate px-3 py-2.5 text-xs text-zinc-600 dark:text-zinc-300" title={e.config}>
+                    <td className="min-w-48 px-3 py-2.5 text-xs text-zinc-600 dark:text-zinc-300" title={e.config}>
                       {configText(e.config, e.productCode)}
                     </td>
                     <td className="px-3 py-2.5 whitespace-nowrap">
@@ -120,13 +149,17 @@ function Notifications() {
             <li key={n.id} className="flex items-start gap-3 px-4 py-3 text-sm">
               <StatusBadge status={n.ok ? 'available' : 'unavailable'}>{n.ok ? '成功' : '失败'}</StatusBadge>
               <div className="min-w-0 flex-1">
-                <div className="text-xs text-zinc-600 dark:text-zinc-300">
-                  <span className="font-medium">{n.channel}</span>
-                  {n.subscriptionId ? ` · 订阅 #${n.subscriptionId}` : ' · 测试消息'}
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs text-zinc-600 dark:text-zinc-300">
+                  <span>
+                    <span className="font-medium">{n.channel}</span>
+                    {n.subscriptionId ? ` · 订阅 #${n.subscriptionId}` : ' · 测试消息'}
+                  </span>
+                  <time className="text-zinc-400 tabular-nums" title={timeAgo(n.at)}>
+                    {formatTime(n.at)}
+                  </time>
                 </div>
                 {n.error && <div className="mt-0.5 text-xs break-all text-rose-600 dark:text-rose-400">{n.error}</div>}
               </div>
-              <time className="shrink-0 text-xs text-zinc-400 tabular-nums">{formatTime(n.at)}</time>
             </li>
           ))}
         </ul>
