@@ -1,0 +1,517 @@
+{
+ "locale": {
+  "currencyCode": "EUR",
+  "subsidiary": "FR",
+  "taxRate": 20
+ },
+ "plans": [
+  {
+   "planCode": "24adv01-v3",
+   "invoiceName": "ADVANCE-1 | AMD EPYC 4244P",
+   "addonFamilies": [],
+   "product": "24adv01",
+   "pricingType": "rental",
+   "consumptionConfiguration": null,
+   "pricings": [
+    {
+     "phase": 0,
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "description": "rental (only applicable for 1 time)",
+     "interval": 0,
+     "intervalUnit": "none",
+     "quantity": {
+      "min": 1,
+      "max": 10
+     },
+     "repeat": {
+      "min": 1,
+      "max": 1
+     },
+     "price": 8999000000,
+     "formattedPrice": "89.99 \u20ac",
+     "tax": 1799800000,
+     "mode": "default",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 1,
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "description": "rental for 1 month",
+     "interval": 1,
+     "intervalUnit": "month",
+     "quantity": {
+      "min": 1,
+      "max": 10
+     },
+     "repeat": {
+      "min": 1,
+      "max": null
+     },
+     "price": 8999000000,
+     "formattedPrice": "89.99 \u20ac",
+     "tax": 1799800000,
+     "mode": "default",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 0,
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "description": "rental (only applicable for 1 time)",
+     "interval": 0,
+     "intervalUnit": "none",
+     "quantity": {
+      "min": 1,
+      "max": 10
+     },
+     "repeat": {
+      "min": 1,
+      "max": 1
+     },
+     "price": 0,
+     "formattedPrice": "0.00 \u20ac",
+     "tax": 0,
+     "mode": "upfront12",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 1,
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "description": "rental for 12 months",
+     "interval": 12,
+     "intervalUnit": "month",
+     "quantity": {
+      "min": 1,
+      "max": 10
+     },
+     "repeat": {
+      "min": 1,
+      "max": null
+     },
+     "price": 102589000000,
+     "formattedPrice": "1025.89 \u20ac",
+     "tax": 20517800000,
+     "mode": "upfront12",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": {
+      "defaultEndAction": "REACTIVATE_ENGAGEMENT",
+      "duration": "P12M",
+      "type": "upfront"
+     }
+    },
+    {
+     "phase": 0,
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "description": "rental (only applicable for 1 time)",
+     "interval": 0,
+     "intervalUnit": "none",
+     "quantity": {
+      "min": 1,
+      "max": 10
+     },
+     "repeat": {
+      "min": 1,
+      "max": 1
+     },
+     "price": 0,
+     "formattedPrice": "0.00 \u20ac",
+     "tax": 0,
+     "mode": "upfront24",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 1,
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "description": "rental for 24 months",
+     "interval": 24,
+     "intervalUnit": "month",
+     "quantity": {
+      "min": 1,
+      "max": 10
+     },
+     "repeat": {
+      "min": 1,
+      "max": null
+     },
+     "price": 205177000000,
+     "formattedPrice": "2051.77 \u20ac",
+     "tax": 41035400000,
+     "mode": "upfront24",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": {
+      "defaultEndAction": "REACTIVATE_ENGAGEMENT",
+      "duration": "P24M",
+      "type": "upfront"
+     }
+    }
+   ],
+   "configurations": [
+    {
+     "name": "dedicated_datacenter",
+     "isCustom": false,
+     "isMandatory": false,
+     "values": [
+      "fra",
+      "gra",
+      "lon",
+      "rbx",
+      "sbg",
+      "waw",
+      "bhs"
+     ]
+    }
+   ],
+   "family": null,
+   "blobs": {
+    "commercial": {
+     "features": [
+      {
+       "name": "release-year",
+       "value": "2024"
+      },
+      {
+       "name": "baremetal-server-usecases",
+       "value": "hosting,bdd"
+      },
+      {
+       "name": "alternative-cpu",
+       "value": "26adv01-v7"
+      },
+      {
+       "name": "last-generation",
+       "value": "false"
+      }
+     ],
+     "name": "ADVANCE-1"
+    }
+   }
+  },
+  {
+   "planCode": "24sk602",
+   "invoiceName": "KS-6 | AMD Epyc 7351P",
+   "addonFamilies": [],
+   "product": "24sk60",
+   "pricingType": "rental",
+   "consumptionConfiguration": null,
+   "pricings": [
+    {
+     "phase": 0,
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "description": "rental (only applicable for 1 time)",
+     "interval": 0,
+     "intervalUnit": "none",
+     "quantity": {
+      "min": 1,
+      "max": 2
+     },
+     "repeat": {
+      "min": 1,
+      "max": 1
+     },
+     "price": 3899000000,
+     "formattedPrice": "38.99 \u20ac",
+     "tax": 779800000,
+     "mode": "default",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 1,
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 0,
+     "description": "rental for 1 month",
+     "interval": 1,
+     "intervalUnit": "month",
+     "quantity": {
+      "min": 1,
+      "max": 2
+     },
+     "repeat": {
+      "min": 1,
+      "max": null
+     },
+     "price": 3899000000,
+     "formattedPrice": "38.99 \u20ac",
+     "tax": 779800000,
+     "mode": "default",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 0,
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "description": "rental (only applicable for 1 time)",
+     "interval": 0,
+     "intervalUnit": "none",
+     "quantity": {
+      "min": 1,
+      "max": 2
+     },
+     "repeat": {
+      "min": 1,
+      "max": 1
+     },
+     "price": 0,
+     "formattedPrice": "0.00 \u20ac",
+     "tax": 0,
+     "mode": "upfront12",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 1,
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 12,
+     "description": "rental for 12 months",
+     "interval": 12,
+     "intervalUnit": "month",
+     "quantity": {
+      "min": 1,
+      "max": 2
+     },
+     "repeat": {
+      "min": 1,
+      "max": null
+     },
+     "price": 44449000000,
+     "formattedPrice": "444.49 \u20ac",
+     "tax": 8889800000,
+     "mode": "upfront12",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": {
+      "defaultEndAction": "REACTIVATE_ENGAGEMENT",
+      "duration": "P12M",
+      "type": "upfront"
+     }
+    },
+    {
+     "phase": 0,
+     "capacities": [
+      "installation"
+     ],
+     "commitment": 0,
+     "description": "rental (only applicable for 1 time)",
+     "interval": 0,
+     "intervalUnit": "none",
+     "quantity": {
+      "min": 1,
+      "max": 2
+     },
+     "repeat": {
+      "min": 1,
+      "max": 1
+     },
+     "price": 0,
+     "formattedPrice": "0.00 \u20ac",
+     "tax": 0,
+     "mode": "upfront24",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": null
+    },
+    {
+     "phase": 1,
+     "capacities": [
+      "renew"
+     ],
+     "commitment": 24,
+     "description": "rental for 24 months",
+     "interval": 24,
+     "intervalUnit": "month",
+     "quantity": {
+      "min": 1,
+      "max": 2
+     },
+     "repeat": {
+      "min": 1,
+      "max": null
+     },
+     "price": 88897000000,
+     "formattedPrice": "888.97 \u20ac",
+     "tax": 17779400000,
+     "mode": "upfront24",
+     "strategy": "tiered",
+     "mustBeCompleted": false,
+     "type": "rental",
+     "promotions": [],
+     "engagementConfiguration": {
+      "defaultEndAction": "REACTIVATE_ENGAGEMENT",
+      "duration": "P24M",
+      "type": "upfront"
+     }
+    }
+   ],
+   "configurations": [
+    {
+     "name": "dedicated_datacenter",
+     "isCustom": false,
+     "isMandatory": false,
+     "values": [
+      "gra",
+      "sbg",
+      "rbx",
+      "bhs",
+      "waw",
+      "fra",
+      "lon"
+     ]
+    }
+   ],
+   "family": null,
+   "blobs": {
+    "commercial": {
+     "features": [
+      {
+       "name": "baremetal-server-usecases",
+       "value": "bdd"
+      }
+     ],
+     "name": "KS-6"
+    }
+   }
+  }
+ ],
+ "products": [
+  {
+   "name": "24adv01",
+   "description": "AMD EPYC 4244P",
+   "blobs": {
+    "technical": {
+     "server": {
+      "cpu": {
+       "boost": 5.1,
+       "brand": "AMD",
+       "cores": 6,
+       "model": "EPYC 4244P",
+       "score": 27900,
+       "number": 1,
+       "threads": 12,
+       "frequency": 3.8
+      },
+      "frame": {
+       "size": "0.5U",
+       "model": "OVH",
+       "dualPowerSupply": false
+      },
+      "range": "advance",
+      "services": {
+       "sla": 99.95,
+       "antiddos": "standard",
+       "includedBackup": 500
+      }
+     }
+    }
+   },
+   "configurations": [
+    {
+     "name": "extra_reservation",
+     "isCustom": true,
+     "isMandatory": false,
+     "values": null
+    }
+   ]
+  },
+  {
+   "name": "24sk60",
+   "description": "AMD Epyc 7351p",
+   "blobs": {
+    "technical": {
+     "server": {
+      "cpu": {
+       "boost": 2.9,
+       "brand": "AMD",
+       "cores": 16,
+       "model": "Epyc 7351p",
+       "score": 19589,
+       "number": 1,
+       "threads": 32,
+       "frequency": 2.4
+      },
+      "frame": {
+       "size": "1U",
+       "model": "OVH",
+       "dualPowerSupply": false
+      },
+      "range": "kimsufi",
+      "services": {
+       "sla": 99.9,
+       "antiddos": "standard"
+      }
+     }
+    }
+   },
+   "configurations": [
+    {
+     "name": "extra_reservation",
+     "isCustom": true,
+     "isMandatory": false,
+     "values": null
+    }
+   ]
+  }
+ ],
+ "addons": []
+}

@@ -1,0 +1,76 @@
+[
+ {
+  "fqn": "24sk602.ram-128g-ecc-2400.softraid-2x1000nvme",
+  "memory": "ram-128g-ecc-2400",
+  "planCode": "24sk602",
+  "server": "24sk60",
+  "storage": "softraid-2x1000nvme",
+  "datacenters": [
+   {
+    "availability": "1H-low",
+    "datacenter": "bhs"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "fra"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "gra"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "lon"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "rbx"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "sbg"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "waw"
+   }
+  ]
+ },
+ {
+  "fqn": "24sk602.ram-128g-ecc-2400.softraid-2x4000sa",
+  "memory": "ram-128g-ecc-2400",
+  "planCode": "24sk602",
+  "server": "24sk60",
+  "storage": "softraid-2x4000sa",
+  "datacenters": [
+   {
+    "availability": "unavailable",
+    "datacenter": "bhs"
+   },
+   {
+    "availability": "72H",
+    "datacenter": "fra"
+   },
+   {
+    "availability": "comingSoon",
+    "datacenter": "gra"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "lon"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "rbx"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "sbg"
+   },
+   {
+    "availability": "unavailable",
+    "datacenter": "waw"
+   }
+  ]
+ }
+]
