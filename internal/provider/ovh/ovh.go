@@ -23,9 +23,9 @@ type regionInfo struct {
 }
 
 var regions = []regionInfo{
-	{provider.Region{ID: "eu", Name: "OVHcloud Europe", Currency: "EUR"}, "https://eu.api.ovh.com/1.0", "FR", "https://eco.ovhcloud.com/fr/"},
-	{provider.Region{ID: "ca", Name: "OVHcloud Canada", Currency: "CAD"}, "https://ca.api.ovh.com/1.0", "CA", "https://eco.ovhcloud.com/en-ca/"},
-	{provider.Region{ID: "us", Name: "OVHcloud US", Currency: "USD"}, "https://api.us.ovhcloud.com/1.0", "US", "https://us.ovhcloud.com/bare-metal/"},
+	{provider.Region{ID: "eu", Name: "欧洲", Currency: "EUR"}, "https://eu.api.ovh.com/1.0", "FR", "https://eco.ovhcloud.com/fr/"},
+	{provider.Region{ID: "ca", Name: "加拿大", Currency: "CAD"}, "https://ca.api.ovh.com/1.0", "CA", "https://eco.ovhcloud.com/en-ca/"},
+	{provider.Region{ID: "us", Name: "美国", Currency: "USD"}, "https://api.us.ovhcloud.com/1.0", "US", "https://us.ovhcloud.com/bare-metal/"},
 }
 
 type Provider struct {

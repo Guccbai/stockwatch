@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gucc/stockwatch/internal/labels"
 	"github.com/gucc/stockwatch/internal/notify"
 	"github.com/gucc/stockwatch/internal/provider"
 	"github.com/gucc/stockwatch/internal/settings"
@@ -158,7 +159,7 @@ func (t *Telegram) send(ctx context.Context, token, chat, text string) error {
 func FormatAlert(a notify.Alert) string {
 	var restock, soldout []string
 	for _, e := range a.Events {
-		line := fmt.Sprintf("• <code>%s</code> %s", html.EscapeString(strings.ToUpper(e.Location)), html.EscapeString(configLabel(e.Config, e.ProductCode)))
+		line := fmt.Sprintf("• <b>%s</b> %s", html.EscapeString(labels.Location(e.Location)), html.EscapeString(labels.Config(e.Config, e.ProductCode)))
 		if e.To.InStock() {
 			line += " · " + html.EscapeString(deliveryLabel(e.RawState))
 			restock = append(restock, line)
@@ -177,12 +178,18 @@ func FormatAlert(a notify.Alert) string {
 	} else {
 		b.WriteString("🔴 <b>售罄</b> ")
 	}
-	fmt.Fprintf(&b, "%s <b>%s</b> <code>%s</code> [%s]\n",
-		html.EscapeString(a.ProviderName), html.EscapeString(name), html.EscapeString(a.Subscription.ProductCode), html.EscapeString(strings.ToUpper(a.Subscription.Region)))
+	fmt.Fprintf(&b, "<b>%s</b> <code>%s</code> · %s\n",
+		html.EscapeString(name), html.EscapeString(a.Subscription.ProductCode), html.EscapeString(regionLabel(a)))
 	if p := a.Product; p != nil {
 		var parts []string
 		if cpu := p.Specs["cpu"]; cpu != "" {
-			parts = append(parts, cpu)
+			parts = append(parts, "CPU "+cpu)
+		}
+		if mem := p.Specs["memory"]; mem != "" {
+			parts = append(parts, "内存 "+labels.Memory(mem))
+		}
+		if sto := p.Specs["storage"]; sto != "" {
+			parts = append(parts, "硬盘 "+labels.Storage(sto))
 		}
 		if p.Price > 0 {
 			parts = append(parts, fmt.Sprintf("%.2f %s/月", p.Price, p.Currency))
@@ -215,10 +222,12 @@ func FormatAlert(a notify.Alert) string {
 	return b.String()
 }
 
-// configLabel strips the plan code from an OVH fqn, leaving the hardware options.
-func configLabel(config, productCode string) string {
-	c := strings.TrimPrefix(config, productCode+".")
-	return strings.ReplaceAll(c, ".", " / ")
+// regionLabel prefers the registry's "OVHcloud · 欧洲", falling back to the provider name the alert carries.
+func regionLabel(a notify.Alert) string {
+	if name, ok := labels.TargetName(a.Subscription.Provider, a.Subscription.Region); ok {
+		return name
+	}
+	return strings.TrimSpace(a.ProviderName + " " + strings.ToUpper(a.Subscription.Region))
 }
 
 func deliveryLabel(raw string) string {

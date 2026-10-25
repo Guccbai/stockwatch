@@ -3,10 +3,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { api, type Subscription, type SubscriptionInput } from '../api'
 import { useProviders } from '../hooks'
-import { configLabel, formatPrice, locationName } from '../lib'
+import { configText, formatPrice, loadTarget, locationInfo, locationName, parseMemory, parseStorage, sortLocations } from '../lib'
 import { Button, Drawer, Field, Input, Select, Toggle, useToast } from './ui'
 
-export const emptySubscription = (provider = 'ovh', region = 'eu'): SubscriptionInput => ({
+// Defaults to the region last viewed on the stock page.
+export const emptySubscription = (provider = loadTarget()?.provider ?? 'ovh', region = loadTarget()?.region ?? 'eu'): SubscriptionInput => ({
   provider,
   region,
   productCode: '',
@@ -48,7 +49,7 @@ export function SubscriptionForm({
   const locations = useMemo(() => {
     const set = new Set<string>(detail.data?.locations ?? [])
     form.locations.forEach((l) => set.add(l))
-    return [...set].sort()
+    return sortLocations([...set])
   }, [detail.data, form.locations])
 
   const matched = useMemo(() => {
@@ -138,7 +139,7 @@ export function SubscriptionForm({
           <datalist id="sw-products">
             {stock.data?.products.map((p) => (
               <option key={p.code} value={p.code}>
-                {p.name} {p.specs?.cpu ?? ''} {p.price ? formatPrice(p.price, p.currency) : ''}
+                {p.name} · {p.specs?.cpu ?? ''} {p.price ? '· ' + formatPrice(p.price, p.currency) : ''}
               </option>
             ))}
           </datalist>
@@ -146,7 +147,9 @@ export function SubscriptionForm({
         {product && (
           <div className="rounded-lg bg-zinc-50 px-3 py-2.5 text-xs text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-300">
             <span className="font-medium text-zinc-900 dark:text-zinc-100">{product.name}</span>
-            {product.specs?.cpu && <> · {product.specs.cpu}</>}
+            {product.specs?.cpu && <> · CPU {product.specs.cpu}</>}
+            {product.specs?.memory && <> · 内存 {parseMemory(product.specs.memory)}</>}
+            {product.specs?.storage && <> · 硬盘 {parseStorage(product.specs.storage)}</>}
             {product.price > 0 && <> · {formatPrice(product.price, product.currency)}/月</>}
           </div>
         )}
@@ -156,6 +159,7 @@ export function SubscriptionForm({
             {locations.length === 0 && <span className="text-xs text-zinc-400">{form.productCode ? '加载中或无数据' : '请先选择机型'}</span>}
             {locations.map((l) => {
               const on = form.locations.includes(l)
+              const info = locationInfo(l)
               return (
                 <button
                   key={l}
@@ -163,13 +167,15 @@ export function SubscriptionForm({
                   title={locationName(l)}
                   onClick={() => set('locations', on ? form.locations.filter((x) => x !== l) : [...form.locations, l])}
                   className={clsx(
-                    'rounded-md px-2.5 py-1 font-mono text-xs font-medium ring-1 transition-colors ring-inset',
+                    'rounded-md px-2.5 py-1 text-xs font-medium ring-1 transition-colors ring-inset',
                     on
                       ? 'bg-emerald-600 text-white ring-emerald-600'
                       : 'bg-white text-zinc-600 ring-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:text-zinc-300 dark:ring-zinc-700 dark:hover:bg-zinc-800',
                   )}
                 >
-                  {l.toUpperCase()}
+                  {info.flag && <span className="mr-1" aria-hidden>{info.flag}</span>}
+                  {info.city}
+                  <span className={clsx('ml-1 font-mono text-[10px]', on ? 'text-emerald-100' : 'text-zinc-400')}>{l.toUpperCase()}</span>
                 </button>
               )
             })}
@@ -181,7 +187,7 @@ export function SubscriptionForm({
           <datalist id="sw-configs">
             {detail.data?.configs.map((c) => (
               <option key={c.config} value={c.config}>
-                {configLabel(c.config, form.productCode)}
+                {configText(c.config, form.productCode)}
               </option>
             ))}
           </datalist>

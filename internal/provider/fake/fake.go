@@ -20,7 +20,7 @@ func New() *Provider { return &Provider{state: map[string]provider.StockStatus{}
 func (p *Provider) ID() string   { return "fake" }
 func (p *Provider) Name() string { return "Fake Cloud" }
 func (p *Provider) Regions() []provider.Region {
-	return []provider.Region{{ID: "test", Name: "Test Region", Currency: "EUR"}}
+	return []provider.Region{{ID: "test", Name: "测试区域", Currency: "EUR"}}
 }
 
 var (

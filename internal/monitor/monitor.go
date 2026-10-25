@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gucc/stockwatch/internal/labels"
 	"github.com/gucc/stockwatch/internal/notify"
 	"github.com/gucc/stockwatch/internal/provider"
 	"github.com/gucc/stockwatch/internal/settings"
@@ -505,7 +506,7 @@ func (m *Monitor) StatusText(ctx context.Context) string {
 		for _, r := range m.Slots(settings.Target{Provider: s.Provider, Region: s.Region}) {
 			if r.Status.InStock() && s.Matches(r.Availability) {
 				n++
-				locs[strings.ToUpper(r.Location)] = true
+				locs[r.Location] = true
 			}
 		}
 		name := s.ProductCode
@@ -519,8 +520,7 @@ func (m *Monitor) StatusText(ctx context.Context) string {
 			for l := range locs {
 				keys = append(keys, l)
 			}
-			sort.Strings(keys)
-			fmt.Fprintf(&b, "🟢 %s <code>%s</code> %d 个配置有货：%s\n", name, s.ProductCode, n, strings.Join(keys, ", "))
+			fmt.Fprintf(&b, "🟢 %s <code>%s</code> %d 个配置有货：%s\n", name, s.ProductCode, n, labels.Locations(keys))
 		}
 	}
 	if !hasAny {
@@ -549,9 +549,9 @@ func (m *Monitor) SubscriptionsText(ctx context.Context) string {
 		}
 		locs := "全部机房"
 		if len(s.Locations) > 0 {
-			locs = strings.ToUpper(strings.Join(s.Locations, ","))
+			locs = labels.Locations(s.Locations)
 		}
-		fmt.Fprintf(&b, "%s #%d %s/%s <code>%s</code> · %s\n", state, s.ID, s.Provider, s.Region, s.ProductCode, locs)
+		fmt.Fprintf(&b, "%s #%d %s <code>%s</code> · %s\n", state, s.ID, labels.Target(s.Provider, s.Region), s.ProductCode, locs)
 	}
 	return b.String()
 }

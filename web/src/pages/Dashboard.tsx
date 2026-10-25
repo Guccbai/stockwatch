@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 import { api, type PollStatus } from '../api'
 import { Badge, Button, Card, CardHeader, Empty, PageHeader, Spinner, StatusDot, useToast } from '../components/ui'
 import { useTick } from '../hooks'
-import { configLabel, deliveryLabel, formatTime, locationName, timeAgo } from '../lib'
+import { configText, deliveryLabel, formatTime, locationName, locationShort, timeAgo } from '../lib'
+import { useTargetName } from '../components/RegionPicker'
 
 function Stat({ label, value, sub, icon, tone = 'zinc' }: { label: string; value: ReactNode; sub?: ReactNode; icon: ReactNode; tone?: 'zinc' | 'emerald' | 'amber' }) {
   return (
@@ -33,14 +34,13 @@ function Stat({ label, value, sub, icon, tone = 'zinc' }: { label: string; value
 }
 
 function PollRow({ p }: { p: PollStatus }) {
+  const targetName = useTargetName()
   const ok = !p.lastError
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-3.5">
       <div className="flex min-w-40 items-center gap-2.5">
         {ok ? <CheckCircle2 className="size-4 text-emerald-500" /> : <AlertTriangle className="size-4 text-amber-500" />}
-        <span className="font-mono text-sm font-medium">
-          {p.target.provider}/{p.target.region}
-        </span>
+        <span className="text-sm font-medium">{targetName(p.target)}</span>
       </div>
       <div className="text-xs text-zinc-500 dark:text-zinc-400">
         上次成功 <span className="text-zinc-700 dark:text-zinc-200">{timeAgo(p.lastSuccess)}</span>
@@ -59,6 +59,7 @@ function PollRow({ p }: { p: PollStatus }) {
 }
 
 export function Dashboard() {
+  const targetName = useTargetName()
   useTick()
   const toast = useToast()
   const { data, isLoading } = useQuery({ queryKey: ['overview'], queryFn: api.overview, refetchInterval: 60_000 })
@@ -128,7 +129,7 @@ export function Dashboard() {
                         <Badge className="font-mono">{w.productCode}</Badge>
                       </div>
                       <div className="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400">
-                        {w.provider}/{w.region} · {w.inStock ? `有货：${w.locations.map((l) => l.toUpperCase()).join(', ')}` : '暂无库存'}
+                        {targetName(w)} · {w.inStock ? `有货：${w.locations.map(locationShort).join('、')}` : '暂无库存'}
                       </div>
                     </div>
                     <span className={clsx('text-sm font-semibold tabular-nums', w.inStock ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400')}>{w.inStock}</span>
@@ -178,9 +179,9 @@ export function Dashboard() {
                     </div>
                     <div className="truncate text-xs text-zinc-500 dark:text-zinc-400" title={e.config}>
                       <span className="font-medium text-zinc-700 dark:text-zinc-300" title={locationName(e.location)}>
-                        {e.location.toUpperCase()}
+                        {locationShort(e.location)}
                       </span>{' '}
-                      · {deliveryLabel(e.rawState)} · {configLabel(e.config, e.productCode)}
+                      · {deliveryLabel(e.rawState)} · {configText(e.config, e.productCode)}
                     </div>
                   </div>
                 </li>

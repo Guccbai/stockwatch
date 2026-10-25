@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { api, type Subscription, type SubscriptionInput } from '../api'
 import { emptySubscription, SubscriptionForm } from '../components/SubscriptionForm'
 import { Badge, Button, Card, Empty, PageHeader, Spinner, StatusDot, Toggle, useToast } from '../components/ui'
-import { timeAgo } from '../lib'
+import { locationName, locationShort, timeAgo } from '../lib'
+import { useTargetName } from '../components/RegionPicker'
 
 const toInput = ({ id: _id, createdAt: _c, ...rest }: Subscription): SubscriptionInput => rest
 
 export function Subscriptions() {
+  const targetName = useTargetName()
   const qc = useQueryClient()
   const toast = useToast()
   const subs = useQuery({ queryKey: ['subscriptions'], queryFn: api.subscriptions })
@@ -80,15 +82,13 @@ export function Subscriptions() {
                         </div>
                         {s.note && <div className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{s.note}</div>}
                       </td>
-                      <td className="px-3 py-3 font-mono text-xs">
-                        {s.provider}/{s.region}
-                      </td>
+                      <td className="px-3 py-3 text-xs whitespace-nowrap">{targetName(s)}</td>
                       <td className="px-3 py-3">
                         {s.locations.length ? (
                           <div className="flex flex-wrap gap-1">
                             {s.locations.map((l) => (
-                              <Badge key={l} className="font-mono">
-                                {l.toUpperCase()}
+                              <Badge key={l}>
+                                <span title={locationName(l)}>{locationShort(l)}</span>
                               </Badge>
                             ))}
                           </div>

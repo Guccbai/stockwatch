@@ -5,11 +5,13 @@ import { useState } from 'react'
 import { api } from '../api'
 import { Badge, Button, Card, Empty, Input, PageHeader, Spinner, StatusBadge } from '../components/ui'
 import { useDebounced } from '../useDebounced'
-import { configLabel, deliveryLabel, formatTime, isInStock, locationName, timeAgo } from '../lib'
+import { configText, deliveryLabel, formatTime, isInStock, locationName, locationShort, timeAgo } from '../lib'
+import { useTargetName } from '../components/RegionPicker'
 
 const PAGE = 100
 
 function Events() {
+  const targetName = useTargetName()
   const [restock, setRestock] = useState(true)
   const [product, setProduct] = useState('')
   const debounced = useDebounced(product.trim(), 300)
@@ -71,15 +73,13 @@ function Events() {
                     </td>
                     <td className="px-3 py-2.5 whitespace-nowrap">
                       <span className="font-mono text-xs font-medium">{e.productCode}</span>
-                      <Badge className="ml-1.5 font-mono">
-                        {e.provider}/{e.region}
-                      </Badge>
+                      <Badge className="ml-1.5">{targetName(e)}</Badge>
                     </td>
-                    <td className="px-3 py-2.5 font-mono text-xs" title={locationName(e.location)}>
-                      {e.location.toUpperCase()}
+                    <td className="px-3 py-2.5 text-xs whitespace-nowrap" title={locationName(e.location)}>
+                      {locationShort(e.location)}
                     </td>
-                    <td className="max-w-80 truncate px-3 py-2.5 font-mono text-[11px] text-zinc-600 dark:text-zinc-300" title={e.config}>
-                      {configLabel(e.config, e.productCode)}
+                    <td className="max-w-96 truncate px-3 py-2.5 text-xs text-zinc-600 dark:text-zinc-300" title={e.config}>
+                      {configText(e.config, e.productCode)}
                     </td>
                     <td className="px-3 py-2.5 whitespace-nowrap">
                       <span className="inline-flex items-center gap-1.5">
