@@ -1,0 +1,17 @@
+{
+  "gopls": {
+    "command": "${CLAUDE_PLUGIN_ROOT}/bin/gopls",
+    "extensionToLanguage": { ".go": "go" },
+    "startupTimeout": 120000
+  },
+  "typescript": {
+    "command": "${CLAUDE_PLUGIN_ROOT}/bin/tsc-lsp",
+    "extensionToLanguage": {
+      ".ts": "typescript",
+      ".tsx": "typescriptreact",
+      ".js": "javascript",
+      ".jsx": "javascriptreact"
+    },
+    "startupTimeout": 60000
+  }
+}

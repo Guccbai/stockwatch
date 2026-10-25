@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "stockwatch-local": {
+      "source": {
+        "source": "directory",
+        "path": "./.claude/lsp"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "stockwatch-lsp@stockwatch-local": true
+  }
+}

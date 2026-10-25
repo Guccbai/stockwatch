@@ -1,0 +1,5 @@
+{
+  "name": "stockwatch-lsp",
+  "version": "1.0.0",
+  "description": "Project-local language servers for StockWatch"
+}

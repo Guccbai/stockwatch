@@ -1,0 +1,11 @@
+{
+  "name": "stockwatch-local",
+  "owner": { "name": "stockwatch" },
+  "plugins": [
+    {
+      "name": "stockwatch-lsp",
+      "description": "Project-local language servers: gopls (tools/go.mod) and the TypeScript 7 native LSP (web/node_modules)",
+      "source": "./plugins/stockwatch-lsp"
+    }
+  ]
+}

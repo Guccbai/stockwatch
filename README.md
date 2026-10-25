@@ -85,3 +85,16 @@ make dev       # 后端 :8080，启用演示服务商，密码默认 stockwatch
 make dev-web   # Vite 开发服务器，/api 代理到 :8080
 make test
 ```
+
+### 语言服务器（Claude Code）
+
+项目自带一个项目级 Claude Code 插件 `stockwatch-lsp`（`.claude/lsp/`，已在 `.claude/settings.json` 中启用），不需要全局安装任何语言服务器：
+
+- **Go**：gopls 版本固定在 `tools/go.mod`（独立模块，不影响主依赖），通过 `go tool -modfile=tools/go.mod gopls` 运行。
+- **TypeScript**：使用 `web/node_modules` 中 TypeScript 7 自带的原生 LSP（`tsc --lsp`），需先在 `web/` 下 `npm ci`。
+
+首次打开项目时信任该目录，Claude Code 会提示安装插件；也可以手动执行：
+
+```bash
+claude plugin install stockwatch-lsp@stockwatch-local --scope project
+```

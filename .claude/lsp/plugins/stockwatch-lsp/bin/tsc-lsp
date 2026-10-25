@@ -1,0 +1,11 @@
+#!/bin/sh
+# TypeScript 7 ships a native LSP in tsc; use the project's own copy.
+set -e
+root="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../../../../.." && pwd)}"
+tsc="$root/web/node_modules/.bin/tsc"
+if [ ! -x "$tsc" ]; then
+  echo "stockwatch-lsp: $tsc not found; run 'npm ci' in web/" >&2
+  exit 1
+fi
+cd "$root/web"
+exec "$tsc" --lsp --stdio "$@"
