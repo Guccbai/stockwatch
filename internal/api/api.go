@@ -287,10 +287,11 @@ func (s *Server) overview(w http.ResponseWriter, r *http.Request) {
 		watched = append(watched, st)
 	}
 
-	telegram := false
+	telegram, anyNotifier := false, false
 	for _, n := range s.Notifiers {
-		if n.Name() == "telegram" && n.Configured(ctx) {
-			telegram = true
+		if n.Configured(ctx) {
+			anyNotifier = true
+			telegram = telegram || n.Name() == "telegram"
 		}
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
@@ -302,6 +303,7 @@ func (s *Server) overview(w http.ResponseWriter, r *http.Request) {
 		"restocks24h":          len(day),
 		"paused":               v.Paused,
 		"telegramConfigured":   telegram,
+		"notifyConfigured":     anyNotifier,
 		"interval":             int(v.Interval.Seconds()),
 	})
 }
@@ -517,6 +519,10 @@ type settingsView struct {
 	TelegramTokenHint string            `json:"telegramTokenHint"`
 	TelegramChatID    string            `json:"telegramChatId"`
 	TelegramCommands  bool              `json:"telegramCommands"`
+	ResendKeySet      bool              `json:"resendKeySet"`
+	ResendKeyHint     string            `json:"resendKeyHint"`
+	ResendFrom        string            `json:"resendFrom"`
+	ResendTo          string            `json:"resendTo"`
 	Interval          int               `json:"interval"`
 	Cooldown          int               `json:"cooldown"`
 	Targets           []settings.Target `json:"targets"`
@@ -530,18 +536,27 @@ func (s *Server) settingsView(ctx context.Context) (settingsView, error) {
 	if err != nil {
 		return settingsView{}, err
 	}
-	hint := ""
-	if n := len(v.TelegramToken); n > 8 {
-		hint = v.TelegramToken[:4] + "…" + v.TelegramToken[n-4:]
-	}
+	hint := secretHint(v.TelegramToken)
 	o := s.Settings.Overrides()
 	return settingsView{
 		TelegramTokenSet: v.TelegramToken != "", TelegramTokenHint: hint,
 		TelegramChatID: v.TelegramChatID, TelegramCommands: v.TelegramCommands,
+		ResendKeySet: v.ResendAPIKey != "", ResendKeyHint: secretHint(v.ResendAPIKey),
+		ResendFrom: v.ResendFrom, ResendTo: v.ResendTo,
 		Interval: int(v.Interval.Seconds()), Cooldown: int(v.Cooldown.Seconds()),
 		Targets: v.Targets, Paused: v.Paused, RetentionDays: v.RetentionDays,
-		EnvOverrides: map[string]bool{"telegramToken": o.TelegramToken != "", "telegramChatId": o.TelegramChatID != ""},
+		EnvOverrides: map[string]bool{
+			"telegramToken": o.TelegramToken != "", "telegramChatId": o.TelegramChatID != "",
+			"resendApiKey": o.ResendAPIKey != "", "resendFrom": o.ResendFrom != "", "resendTo": o.ResendTo != "",
+		},
 	}, nil
+}
+
+func secretHint(secret string) string {
+	if n := len(secret); n > 8 {
+		return secret[:4] + "…" + secret[n-4:]
+	}
+	return ""
 }
 
 func (s *Server) getSettings(w http.ResponseWriter, r *http.Request) {
@@ -558,6 +573,9 @@ func (s *Server) putSettings(w http.ResponseWriter, r *http.Request) {
 		TelegramToken    *string            `json:"telegramToken"`
 		TelegramChatID   *string            `json:"telegramChatId"`
 		TelegramCommands *bool              `json:"telegramCommands"`
+		ResendAPIKey     *string            `json:"resendApiKey"`
+		ResendFrom       *string            `json:"resendFrom"`
+		ResendTo         *string            `json:"resendTo"`
 		Interval         *int               `json:"interval"`
 		Cooldown         *int               `json:"cooldown"`
 		Targets          *[]settings.Target `json:"targets"`
@@ -577,6 +595,15 @@ func (s *Server) putSettings(w http.ResponseWriter, r *http.Request) {
 	}
 	if body.TelegramCommands != nil {
 		kv[settings.KeyTelegramCommands] = strconv.FormatBool(*body.TelegramCommands)
+	}
+	if body.ResendAPIKey != nil {
+		kv[settings.KeyResendAPIKey] = strings.TrimSpace(*body.ResendAPIKey)
+	}
+	if body.ResendFrom != nil {
+		kv[settings.KeyResendFrom] = strings.TrimSpace(*body.ResendFrom)
+	}
+	if body.ResendTo != nil {
+		kv[settings.KeyResendTo] = strings.TrimSpace(*body.ResendTo)
 	}
 	if body.Interval != nil {
 		if time.Duration(*body.Interval)*time.Second < settings.MinInterval {
@@ -630,8 +657,12 @@ func (s *Server) putSettings(w http.ResponseWriter, r *http.Request) {
 func (s *Server) testNotify(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
 	defer cancel()
+	channel := r.URL.Query().Get("channel")
+	if channel == "" {
+		channel = "telegram"
+	}
 	for _, n := range s.Notifiers {
-		if n.Name() != "telegram" {
+		if n.Name() != channel {
 			continue
 		}
 		err := n.SendTest(ctx)
@@ -640,8 +671,10 @@ func (s *Server) testNotify(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, http.StatusBadGateway, err.Error())
 			return
 		}
+		writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
+		return
 	}
-	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
+	writeErr(w, http.StatusBadRequest, "unknown channel "+channel)
 }
 
 func errString(err error) string {

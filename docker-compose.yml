@@ -12,3 +12,6 @@ services:
       # Optional: override the values set in the WebUI
       # SW_TELEGRAM_TOKEN: "123456:ABC..."
       # SW_TELEGRAM_CHAT_ID: "123456789"
+      # SW_RESEND_API_KEY: "re_..."
+      # SW_RESEND_FROM: "StockWatch <alerts@example.com>"
+      # SW_RESEND_TO: "me@example.com"

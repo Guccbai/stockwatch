@@ -15,6 +15,9 @@ const (
 	KeyTelegramToken    = "telegram.token"
 	KeyTelegramChatID   = "telegram.chat_id"
 	KeyTelegramCommands = "telegram.commands"
+	KeyResendAPIKey     = "resend.api_key"
+	KeyResendFrom       = "resend.from"
+	KeyResendTo         = "resend.to"
 	KeyInterval         = "monitor.interval"
 	KeyCooldown         = "monitor.cooldown"
 	KeyTargets          = "monitor.targets"
@@ -41,6 +44,9 @@ type Values struct {
 	TelegramToken    string        `json:"-"`
 	TelegramChatID   string        `json:"telegramChatId"`
 	TelegramCommands bool          `json:"telegramCommands"`
+	ResendAPIKey     string        `json:"-"`
+	ResendFrom       string        `json:"resendFrom"`
+	ResendTo         string        `json:"resendTo"`
 	Interval         time.Duration `json:"-"`
 	Cooldown         time.Duration `json:"-"`
 	Targets          []Target      `json:"targets"`
@@ -51,6 +57,9 @@ type Values struct {
 type Overrides struct {
 	TelegramToken  string
 	TelegramChatID string
+	ResendAPIKey   string
+	ResendFrom     string
+	ResendTo       string
 }
 
 type Settings struct {
@@ -71,6 +80,9 @@ func (s *Settings) Get(ctx context.Context) (Values, error) {
 		TelegramToken:    m[KeyTelegramToken],
 		TelegramChatID:   m[KeyTelegramChatID],
 		TelegramCommands: m[KeyTelegramCommands] != "false",
+		ResendAPIKey:     m[KeyResendAPIKey],
+		ResendFrom:       m[KeyResendFrom],
+		ResendTo:         m[KeyResendTo],
 		Interval:         seconds(m[KeyInterval], DefaultInterval),
 		Cooldown:         seconds(m[KeyCooldown], DefaultCooldown),
 		Targets:          ParseTargets(m[KeyTargets]),
@@ -91,6 +103,15 @@ func (s *Settings) Get(ctx context.Context) (Values, error) {
 	}
 	if s.overrides.TelegramChatID != "" {
 		v.TelegramChatID = s.overrides.TelegramChatID
+	}
+	if s.overrides.ResendAPIKey != "" {
+		v.ResendAPIKey = s.overrides.ResendAPIKey
+	}
+	if s.overrides.ResendFrom != "" {
+		v.ResendFrom = s.overrides.ResendFrom
+	}
+	if s.overrides.ResendTo != "" {
+		v.ResendTo = s.overrides.ResendTo
 	}
 	return v, nil
 }

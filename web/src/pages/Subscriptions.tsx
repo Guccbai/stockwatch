@@ -41,7 +41,7 @@ export function Subscriptions() {
     <>
       <PageHeader
         title="订阅管理"
-        description="订阅的机型在指定机房补货时，通过 Telegram 推送通知"
+        description="订阅的机型在指定机房补货时，通过 Telegram / 邮件推送通知"
         actions={
           <Button variant="primary" onClick={() => setForm({ initial: emptySubscription() })}>
             <Plus className="size-4" /> 新建订阅

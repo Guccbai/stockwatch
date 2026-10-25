@@ -17,6 +17,10 @@ type Config struct {
 	TelegramToken  string
 	TelegramChatID string
 	TelegramAPI    string // Bot API base URL; change for a self-hosted Bot API server or reverse proxy
+	ResendAPIKey   string
+	ResendFrom     string
+	ResendTo       string
+	ResendAPI      string // Resend API base URL
 
 	FakeProvider bool // registers a fake provider that flips stock states, for end-to-end testing
 	HTTPTimeout  time.Duration
@@ -30,6 +34,10 @@ func Load() Config {
 		TelegramToken:  os.Getenv("SW_TELEGRAM_TOKEN"),
 		TelegramChatID: os.Getenv("SW_TELEGRAM_CHAT_ID"),
 		TelegramAPI:    env("SW_TELEGRAM_API", "https://api.telegram.org"),
+		ResendAPIKey:   os.Getenv("SW_RESEND_API_KEY"),
+		ResendFrom:     os.Getenv("SW_RESEND_FROM"),
+		ResendTo:       os.Getenv("SW_RESEND_TO"),
+		ResendAPI:      env("SW_RESEND_API", "https://api.resend.com"),
 		FakeProvider:   envBool("SW_FAKE_PROVIDER"),
 		HTTPTimeout:    30 * time.Second,
 	}

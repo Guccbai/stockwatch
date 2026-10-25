@@ -32,7 +32,7 @@ function TelegramCard({ s }: { s: Settings }) {
   }, [s])
 
   const test = useMutation({
-    mutationFn: api.testNotify,
+    mutationFn: () => api.testNotify('telegram'),
     onSuccess: () => toast('success', '测试消息已发送'),
     onError: (e) => toast('error', `发送失败：${(e as Error).message}`),
   })
@@ -71,6 +71,67 @@ function TelegramCard({ s }: { s: Settings }) {
           </Button>
           <Button type="button" onClick={() => test.mutate()} loading={test.isPending} disabled={!s.telegramTokenSet || !s.telegramChatId}>
             <Send className="size-4" /> 发送测试消息
+          </Button>
+        </div>
+      </form>
+    </Card>
+  )
+}
+
+function ResendCard({ s }: { s: Settings }) {
+  const toast = useToast()
+  const save = useSave()
+  const [apiKey, setApiKey] = useState('')
+  const [from, setFrom] = useState(s.resendFrom)
+  const [to, setTo] = useState(s.resendTo)
+  useEffect(() => {
+    setFrom(s.resendFrom)
+    setTo(s.resendTo)
+  }, [s])
+
+  const test = useMutation({
+    mutationFn: () => api.testNotify('resend'),
+    onSuccess: () => toast('success', '测试邮件已发送'),
+    onError: (e) => toast('error', `发送失败：${(e as Error).message}`),
+  })
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault()
+    const body: SettingsUpdate = {}
+    if (!s.envOverrides.resendFrom) body.resendFrom = from
+    if (!s.envOverrides.resendTo) body.resendTo = to
+    if (apiKey && !s.envOverrides.resendApiKey) body.resendApiKey = apiKey
+    save.mutate(body, { onSuccess: () => setApiKey('') })
+  }
+
+  return (
+    <Card>
+      <CardHeader title="Resend 邮件通知" description="补货时通过 Resend 发送邮件" />
+      <form onSubmit={submit} className="space-y-4 p-5">
+        <Field
+          label="API Key"
+          hint={
+            s.envOverrides.resendApiKey
+              ? '由环境变量 SW_RESEND_API_KEY 提供，无法在此修改'
+              : s.resendKeySet
+                ? `已设置（${s.resendKeyHint || '已隐藏'}），留空保持不变`
+                : '在 resend.com/api-keys 创建，需要 Sending access 权限'
+          }
+        >
+          <Input type="password" autoComplete="off" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder={s.resendKeySet ? '••••••••' : 're_…'} disabled={s.envOverrides.resendApiKey} />
+        </Field>
+        <Field label="发件人" hint={s.envOverrides.resendFrom ? '由环境变量 SW_RESEND_FROM 提供' : '必须使用已在 Resend 验证的域名；测试可用 onboarding@resend.dev（仅能发给自己的账号邮箱）'}>
+          <Input value={from} onChange={(e) => setFrom(e.target.value)} placeholder="StockWatch <alerts@example.com>" disabled={s.envOverrides.resendFrom} />
+        </Field>
+        <Field label="收件人" hint={s.envOverrides.resendTo ? '由环境变量 SW_RESEND_TO 提供' : '多个用英文逗号分隔'}>
+          <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="me@example.com" disabled={s.envOverrides.resendTo} />
+        </Field>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button type="submit" variant="primary" loading={save.isPending}>
+            保存
+          </Button>
+          <Button type="button" onClick={() => test.mutate()} loading={test.isPending} disabled={!s.resendKeySet || !s.resendFrom || !s.resendTo}>
+            <Send className="size-4" /> 发送测试邮件
           </Button>
         </div>
       </form>
@@ -226,6 +287,7 @@ export function SettingsPage() {
       <PageHeader title="设置" />
       <div className="space-y-6">
         <TelegramCard s={data} />
+        <ResendCard s={data} />
         <MonitorCard s={data} />
         <PauseCard s={data} />
         <PasswordCard />

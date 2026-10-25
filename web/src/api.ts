@@ -156,6 +156,7 @@ export interface Overview {
   restocks24h: number
   paused: boolean
   telegramConfigured: boolean
+  notifyConfigured: boolean
   interval: number
 }
 
@@ -164,16 +165,21 @@ export interface Settings {
   telegramTokenHint: string
   telegramChatId: string
   telegramCommands: boolean
+  resendKeySet: boolean
+  resendKeyHint: string
+  resendFrom: string
+  resendTo: string
   interval: number
   cooldown: number
   targets: Target[]
   paused: boolean
   retentionDays: number
-  envOverrides: { telegramToken: boolean; telegramChatId: boolean }
+  envOverrides: { telegramToken: boolean; telegramChatId: boolean; resendApiKey: boolean; resendFrom: boolean; resendTo: boolean }
 }
 
-export type SettingsUpdate = Partial<Omit<Settings, 'telegramTokenSet' | 'telegramTokenHint' | 'envOverrides'>> & {
+export type SettingsUpdate = Partial<Omit<Settings, 'telegramTokenSet' | 'telegramTokenHint' | 'resendKeySet' | 'resendKeyHint' | 'envOverrides'>> & {
   telegramToken?: string
+  resendApiKey?: string
 }
 
 export class ApiError extends Error {
@@ -243,6 +249,6 @@ export const api = {
 
   settings: () => request<Settings>('GET', '/settings'),
   updateSettings: (s: SettingsUpdate) => request<Settings>('PUT', '/settings', s),
-  testNotify: () => request<{ ok: boolean }>('POST', '/notify/test'),
+  testNotify: (channel: 'telegram' | 'resend') => request<{ ok: boolean }>('POST', `/notify/test?channel=${channel}`),
   pollNow: () => request<{ ok: boolean }>('POST', '/poll'),
 }

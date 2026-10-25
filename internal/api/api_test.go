@@ -137,6 +137,10 @@ func TestAPIFlow(t *testing.T) {
 	if sv.Interval != 30 || !sv.TelegramTokenSet || sv.TelegramTokenHint != "1234…GHIJ" || sv.TelegramChatID != "42" {
 		t.Errorf("unexpected settings: %+v", sv)
 	}
+	do(t, c, "PUT", u+"/settings", map[string]any{"resendApiKey": " re_1234567890 ", "resendFrom": "sw@example.com", "resendTo": "a@example.com"}, &sv)
+	if !sv.ResendKeySet || sv.ResendKeyHint != "re_1…7890" || sv.ResendFrom != "sw@example.com" || sv.ResendTo != "a@example.com" {
+		t.Errorf("unexpected resend settings: %+v", sv)
+	}
 
 	if code := do(t, c, "DELETE", u+"/subscriptions/"+itoa(created.ID), nil, nil); code != 204 {
 		t.Fatalf("delete: %d", code)

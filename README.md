@@ -1,6 +1,6 @@
 # StockWatch
 
-通用的云服务商库存监控平台。单个二进制（内嵌 WebUI + SQLite），库存变化时通过 Telegram 推送。
+通用的云服务商库存监控平台。单个二进制（内嵌 WebUI + SQLite），库存变化时通过 Telegram 或 Resend 邮件推送。
 
 第一版支持 **OVHcloud 独立服务器**（Kimsufi / So you Start / Rise / Advance 等），覆盖 EU、CA、US 三个区域，使用 OVH 公开接口，无需 API Key。
 
@@ -9,6 +9,7 @@
 - **库存浏览**：机型 × 机房矩阵，显示每个机房有货的配置数和最快交付时间；展开可看到每个内存/硬盘配置的状态。
 - **订阅**：按机型订阅，可限定机房、按配置子串过滤（如 `ram-64g`、`nvme`），选择“仅补货”或“补货 + 售罄”通知。
 - **Telegram 通知**：同一次轮询的变化合并成一条消息；同一配置在冷却期内反复变化只通知一次。支持多个 chat_id。
+- **邮件通知**：通过 [Resend](https://resend.com) 发送，支持多个收件人；可与 Telegram 同时启用。
 - **Bot 命令**：`/status` 当前有货的订阅、`/subs` 订阅列表、`/pause` `/resume` 暂停/恢复通知（只响应已配置的 chat）。
 - **历史记录**：所有状态变化和通知发送结果，SSE 实时刷新。
 
@@ -25,7 +26,7 @@ docker run -d --name stockwatch -p 8080:8080 -v ./data:/data \
 
 或使用仓库里的 `docker-compose.yml`（`docker compose up -d`；加 `--build` 则从源码构建）。
 
-打开 http://localhost:8080 ，用 `SW_ADMIN_PASSWORD` 登录，在「设置」中填写 Telegram Bot Token 和 Chat ID，点击「发送测试消息」确认。
+打开 http://localhost:8080 ，用 `SW_ADMIN_PASSWORD` 登录，在「设置」中填写 Telegram Bot Token 和 Chat ID，或 Resend API Key、发件人和收件人，点击「发送测试消息 / 测试邮件」确认。
 
 ### 预编译二进制
 
@@ -56,6 +57,10 @@ SW_ADMIN_PASSWORD=your-password ./bin/stockwatch
 | `SW_TELEGRAM_TOKEN` | — | 可选，覆盖 WebUI 中的 Bot Token |
 | `SW_TELEGRAM_CHAT_ID` | — | 可选，覆盖 WebUI 中的 Chat ID（逗号分隔） |
 | `SW_TELEGRAM_API` | `https://api.telegram.org` | Bot API 地址，可指向自建 Bot API 服务或反向代理 |
+| `SW_RESEND_API_KEY` | — | 可选，覆盖 WebUI 中的 Resend API Key |
+| `SW_RESEND_FROM` | — | 可选，覆盖 WebUI 中的发件人（需为 Resend 已验证域名，如 `StockWatch <alerts@example.com>`） |
+| `SW_RESEND_TO` | — | 可选，覆盖 WebUI 中的收件人（逗号分隔） |
+| `SW_RESEND_API` | `https://api.resend.com` | Resend API 地址 |
 | `SW_FAKE_PROVIDER` | `false` | 启用一个每次轮询都会翻转库存的演示服务商，用于测试通知 |
 
 轮询间隔（最小 15 秒）、通知冷却、监控区域、历史保留天数都在 WebUI「设置」中调整。有启用订阅的区域会自动加入监控。
@@ -69,7 +74,7 @@ cmd/stockwatch          入口
 internal/provider       Provider 接口与注册表
 internal/provider/ovh   OVH 实现（库存 + 目录/价格）
 internal/monitor        调度、状态对比、通知分发、SSE Hub
-internal/notify         Notifier 接口；telegram/ 为 Telegram 实现
+internal/notify         Notifier 接口；telegram/、resend/ 为 Telegram、邮件实现
 internal/store          SQLite 持久化与迁移
 internal/api            REST API、鉴权、SSE、内嵌 SPA
 web/                    React + Vite + Tailwind WebUI

@@ -15,6 +15,7 @@ import (
 	"github.com/Guccbai/stockwatch/internal/config"
 	"github.com/Guccbai/stockwatch/internal/monitor"
 	"github.com/Guccbai/stockwatch/internal/notify"
+	"github.com/Guccbai/stockwatch/internal/notify/resend"
 	"github.com/Guccbai/stockwatch/internal/notify/telegram"
 	"github.com/Guccbai/stockwatch/internal/provider"
 	"github.com/Guccbai/stockwatch/internal/provider/fake"
@@ -50,7 +51,10 @@ func run(log *slog.Logger) error {
 	}
 	defer st.Close()
 
-	set := settings.New(st, settings.Overrides{TelegramToken: cfg.TelegramToken, TelegramChatID: cfg.TelegramChatID})
+	set := settings.New(st, settings.Overrides{
+		TelegramToken: cfg.TelegramToken, TelegramChatID: cfg.TelegramChatID,
+		ResendAPIKey: cfg.ResendAPIKey, ResendFrom: cfg.ResendFrom, ResendTo: cfg.ResendTo,
+	})
 	au := auth.New(st, set)
 	generated, err := au.EnsurePassword(ctx, cfg.AdminPassword)
 	if err != nil {
@@ -61,7 +65,7 @@ func run(log *slog.Logger) error {
 	}
 
 	tg := telegram.New(set, cfg.TelegramAPI, log)
-	notifiers := []notify.Notifier{tg}
+	notifiers := []notify.Notifier{tg, resend.New(set, cfg.ResendAPI)}
 	hub := monitor.NewHub()
 	mon := monitor.New(st, set, notifiers, hub, log)
 	if err := mon.Load(ctx); err != nil {

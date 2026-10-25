@@ -84,10 +84,10 @@ export function Dashboard() {
         }
       />
 
-      {!data.telegramConfigured && (
+      {!data.notifyConfigured && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
           <span className="flex items-center gap-2">
-            <Send className="size-4" /> 尚未配置 Telegram，补货时将无法收到推送。
+            <Send className="size-4" /> 尚未配置通知渠道（Telegram 或 Resend 邮件），补货时将无法收到推送。
           </span>
           <Link to="/settings" className="font-medium underline underline-offset-2">
             前往设置
