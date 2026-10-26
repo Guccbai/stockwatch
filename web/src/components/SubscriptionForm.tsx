@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api, type Subscription, type SubscriptionInput } from '../api'
 import { useProviders } from '../hooks'
 import { configText, formatPrice, loadTarget, locationInfo, locationName, parseMemory, parseStorage, sortLocations } from '../lib'
-import { Button, Drawer, Field, Input, Select, Toggle, useToast } from './ui'
+import { Button, Drawer, Field, Input, Select, StatusDot, Toggle, useToast } from './ui'
 
 // Defaults to the region last viewed on the stock page.
 export const emptySubscription = (provider = loadTarget()?.provider ?? 'ovh', region = loadTarget()?.region ?? 'eu'): SubscriptionInput => ({
@@ -12,6 +12,7 @@ export const emptySubscription = (provider = loadTarget()?.provider ?? 'ovh', re
   region,
   productCode: '',
   locations: [],
+  configs: [],
   configFilter: '',
   notifyOn: 'restock',
   enabled: true,
@@ -52,11 +53,26 @@ export function SubscriptionForm({
     return sortLocations([...set])
   }, [detail.data, form.locations])
 
+  // Subscribed configs that dropped out of the current stock data stay listed so they can be unticked.
+  const configs = useMemo(() => {
+    const rows = (detail.data?.configs ?? []).map((c) => ({
+      config: c.config,
+      price: c.price,
+      inStock: Object.values(c.locations).some((s) => s.status === 'available' || s.status === 'low'),
+    }))
+    for (const c of form.configs) if (!rows.some((r) => r.config === c)) rows.push({ config: c, price: null, inStock: false })
+    // Initially selected first (fixed while ticking, so rows don't jump), then in stock, then cheapest.
+    const picked = (c: (typeof rows)[number]) => Number(initial.configs.includes(c.config))
+    const price = (c: (typeof rows)[number]) => c.price?.price ?? Infinity
+    return rows.sort((a, b) => picked(b) - picked(a) || Number(b.inStock) - Number(a.inStock) || price(a) - price(b))
+  }, [detail.data, form.configs, initial.configs])
+
   const matched = useMemo(() => {
     if (!detail.data) return null
     let total = 0
     let inStock = 0
     for (const c of detail.data.configs) {
+      if (form.configs.length && !form.configs.includes(c.config)) continue
       if (form.configFilter && !c.config.includes(form.configFilter)) continue
       for (const [loc, s] of Object.entries(c.locations)) {
         if (form.locations.length && !form.locations.includes(loc)) continue
@@ -65,7 +81,7 @@ export function SubscriptionForm({
       }
     }
     return { total, inStock }
-  }, [detail.data, form.configFilter, form.locations])
+  }, [detail.data, form.configs, form.configFilter, form.locations])
 
   const save = useMutation({
     mutationFn: () => (editing ? api.updateSubscription(editing.id, form) : api.createSubscription(form)),
@@ -104,7 +120,7 @@ export function SubscriptionForm({
               value={form.provider}
               onChange={(e) => {
                 const p = providers.data?.find((x) => x.id === e.target.value)
-                setForm((f) => ({ ...f, provider: e.target.value, region: p?.regions[0]?.id ?? '', productCode: '', locations: [], configFilter: '' }))
+                setForm((f) => ({ ...f, provider: e.target.value, region: p?.regions[0]?.id ?? '', productCode: '', locations: [], configs: [], configFilter: '' }))
               }}
             >
               {providers.data?.map((p) => (
@@ -115,7 +131,7 @@ export function SubscriptionForm({
             </Select>
           </Field>
           <Field label="区域">
-            <Select value={form.region} onChange={(e) => setForm((f) => ({ ...f, region: e.target.value, productCode: '', locations: [], configFilter: '' }))}>
+            <Select value={form.region} onChange={(e) => setForm((f) => ({ ...f, region: e.target.value, productCode: '', locations: [], configs: [], configFilter: '' }))}>
               {currentProvider?.regions.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
@@ -133,7 +149,7 @@ export function SubscriptionForm({
             onChange={(e) => {
               const v = e.target.value.trim()
               const hit = stock.data?.products.find((p) => p.code === v || p.name.toLowerCase() === v.toLowerCase())
-              setForm((f) => ({ ...f, productCode: hit?.code ?? v, locations: [], configFilter: '' }))
+              setForm((f) => ({ ...f, productCode: hit?.code ?? v, locations: [], configs: [], configFilter: '' }))
             }}
           />
           <datalist id="sw-products">
@@ -183,7 +199,29 @@ export function SubscriptionForm({
           </div>
         </Field>
 
-        <Field label="配置过滤" hint="对配置 ID 做子串匹配，例如 ram-64g 或 nvme；留空表示全部配置">
+        <Field label="配置" hint={form.configs.length ? `已选 ${form.configs.length} 个配置` : '不选则监控该机型的全部配置'}>
+          <div className="max-h-60 divide-y divide-zinc-100 overflow-y-auto rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-700">
+            {configs.length === 0 && <p className="px-3 py-2 text-xs text-zinc-400">{form.productCode ? '加载中或无数据' : '请先选择机型'}</p>}
+            {configs.map((c) => {
+              const on = form.configs.includes(c.config)
+              return (
+                <label key={c.config} title={c.config} className="flex cursor-pointer items-center gap-2.5 px-3 py-2 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
+                  <input
+                    type="checkbox"
+                    checked={on}
+                    onChange={() => set('configs', on ? form.configs.filter((x) => x !== c.config) : [...form.configs, c.config])}
+                    className="accent-emerald-600"
+                  />
+                  <StatusDot status={c.inStock ? 'available' : 'unavailable'} />
+                  <span className="min-w-0 flex-1">{configText(c.config, form.productCode)}</span>
+                  {c.price && <span className="text-zinc-500 tabular-nums">{formatPrice(c.price.price, detail.data?.product?.currency ?? '')}</span>}
+                </label>
+              )
+            })}
+          </div>
+        </Field>
+
+        <Field label="配置 ID 过滤" hint="高级：对配置 ID 做子串匹配，例如 ram-64g 或 nvme；留空表示不过滤">
           <Input list="sw-configs" value={form.configFilter} onChange={(e) => set('configFilter', e.target.value)} placeholder="可选" />
           <datalist id="sw-configs">
             {detail.data?.configs.map((c) => (

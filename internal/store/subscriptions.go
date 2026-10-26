@@ -23,6 +23,7 @@ type Subscription struct {
 	Region       string    `json:"region"`
 	ProductCode  string    `json:"productCode"`
 	Locations    []string  `json:"locations"`
+	Configs      []string  `json:"configs"` // exact configuration ids; empty = any
 	ConfigFilter string    `json:"configFilter"`
 	NotifyOn     string    `json:"notifyOn"`
 	Enabled      bool      `json:"enabled"`
@@ -36,6 +37,9 @@ func (s Subscription) Matches(a provider.Availability) bool {
 		return false
 	}
 	if len(s.Locations) > 0 && !slices.Contains(s.Locations, a.Location) {
+		return false
+	}
+	if len(s.Configs) > 0 && !slices.Contains(s.Configs, a.Config) {
 		return false
 	}
 	if s.ConfigFilter != "" && !strings.Contains(a.Config, s.ConfigFilter) {
@@ -61,21 +65,28 @@ func (s *Subscription) Normalize() error {
 	if s.Locations == nil {
 		s.Locations = []string{}
 	}
+	if s.Configs == nil {
+		s.Configs = []string{}
+	}
 	return nil
 }
 
-const subCols = "id, provider, region, product_code, locations, config_filter, notify_on, enabled, note, created_at"
+const subCols = "id, provider, region, product_code, locations, configs, config_filter, notify_on, enabled, note, created_at"
 
 func scanSub(sc interface{ Scan(...any) error }) (Subscription, error) {
 	var s Subscription
-	var locs string
+	var locs, configs string
 	var created int64
-	if err := sc.Scan(&s.ID, &s.Provider, &s.Region, &s.ProductCode, &locs, &s.ConfigFilter, &s.NotifyOn, &s.Enabled, &s.Note, &created); err != nil {
+	if err := sc.Scan(&s.ID, &s.Provider, &s.Region, &s.ProductCode, &locs, &configs, &s.ConfigFilter, &s.NotifyOn, &s.Enabled, &s.Note, &created); err != nil {
 		return s, err
 	}
 	_ = json.Unmarshal([]byte(locs), &s.Locations)
 	if s.Locations == nil {
 		s.Locations = []string{}
+	}
+	_ = json.Unmarshal([]byte(configs), &s.Configs)
+	if s.Configs == nil {
+		s.Configs = []string{}
 	}
 	s.CreatedAt = time.Unix(created, 0)
 	return s, nil
@@ -108,11 +119,12 @@ func (s *Store) GetSubscription(ctx context.Context, id int64) (Subscription, er
 
 func (s *Store) CreateSubscription(ctx context.Context, sub *Subscription) error {
 	locs, _ := json.Marshal(sub.Locations)
+	configs, _ := json.Marshal(sub.Configs)
 	sub.CreatedAt = time.Now()
 	res, err := s.db.ExecContext(ctx,
-		`INSERT INTO subscriptions(provider, region, product_code, locations, config_filter, notify_on, enabled, note, created_at)
-		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		sub.Provider, sub.Region, sub.ProductCode, string(locs), sub.ConfigFilter, sub.NotifyOn, sub.Enabled, sub.Note, sub.CreatedAt.Unix())
+		`INSERT INTO subscriptions(provider, region, product_code, locations, configs, config_filter, notify_on, enabled, note, created_at)
+		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		sub.Provider, sub.Region, sub.ProductCode, string(locs), string(configs), sub.ConfigFilter, sub.NotifyOn, sub.Enabled, sub.Note, sub.CreatedAt.Unix())
 	if err != nil {
 		return err
 	}
@@ -122,10 +134,11 @@ func (s *Store) CreateSubscription(ctx context.Context, sub *Subscription) error
 
 func (s *Store) UpdateSubscription(ctx context.Context, sub *Subscription) error {
 	locs, _ := json.Marshal(sub.Locations)
+	configs, _ := json.Marshal(sub.Configs)
 	res, err := s.db.ExecContext(ctx,
-		`UPDATE subscriptions SET provider = ?, region = ?, product_code = ?, locations = ?, config_filter = ?, notify_on = ?, enabled = ?, note = ?
+		`UPDATE subscriptions SET provider = ?, region = ?, product_code = ?, locations = ?, configs = ?, config_filter = ?, notify_on = ?, enabled = ?, note = ?
 		 WHERE id = ?`,
-		sub.Provider, sub.Region, sub.ProductCode, string(locs), sub.ConfigFilter, sub.NotifyOn, sub.Enabled, sub.Note, sub.ID)
+		sub.Provider, sub.Region, sub.ProductCode, string(locs), string(configs), sub.ConfigFilter, sub.NotifyOn, sub.Enabled, sub.Note, sub.ID)
 	if err != nil {
 		return err
 	}

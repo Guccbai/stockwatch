@@ -141,7 +141,7 @@ function SpecList({ specs }: { specs: ProductSummary['specs'] }) {
   )
 }
 
-function Detail({ target, code, focus }: { target: Target; code: string; focus: string }) {
+function Detail({ target, code, focus, onSubscribe }: { target: Target; code: string; focus: string; onSubscribe: (config: string) => void }) {
   const { data, isLoading } = useQuery({
     queryKey: ['stock-detail', target, code],
     queryFn: () => api.stockDetail(target, code),
@@ -174,13 +174,23 @@ function Detail({ target, code, focus }: { target: Target; code: string; focus: 
             key={c.config}
             title={c.spec.raw}
             className={clsx(
-              'grid gap-x-4 gap-y-1 px-3 py-2 text-xs sm:grid-cols-[minmax(8rem,10.5rem)_minmax(10rem,17rem)_minmax(0,1fr)_5.5rem]',
+              'group/config grid gap-x-4 gap-y-1 px-3 py-2 text-xs sm:grid-cols-[minmax(8rem,10.5rem)_minmax(10rem,17rem)_minmax(0,1fr)_5.5rem]',
               !c.inStock.length && 'text-zinc-400 dark:text-zinc-500',
             )}
           >
-            <span>
-              <span className="mr-1 text-zinc-400 dark:text-zinc-500">内存</span>
-              {c.spec.memory || c.spec.raw}
+            <span className="flex items-start gap-1">
+              <button
+                type="button"
+                title="只订阅这个配置"
+                onClick={() => onSubscribe(c.config)}
+                className="-my-0.5 -ml-1 rounded p-0.5 text-zinc-400 opacity-50 group-hover/config:opacity-100 hover:bg-zinc-100 hover:text-emerald-600 dark:hover:bg-zinc-700"
+              >
+                <BellPlus className="size-3.5" />
+              </button>
+              <span>
+                <span className="mr-1 text-zinc-400 dark:text-zinc-500">内存</span>
+                {c.spec.memory || c.spec.raw}
+              </span>
             </span>
             <span>
               <span className="mr-1 text-zinc-400 dark:text-zinc-500">硬盘</span>
@@ -346,10 +356,11 @@ export function Stock() {
   }, [data, q, family, location, onlyInStock, onlyCatalog])
 
   const locations = useMemo(() => sortLocations(data?.locations ?? []), [data])
-  const subscribe = (code: string) =>
+  const subscribe = (code: string, config?: string) =>
     setSubInit({
       ...emptySubscription(target.provider, target.region),
       productCode: code,
+      configs: config ? [config] : [],
     })
 
   const monitored = settings.data?.targets.some((t) => targetKey(t) === targetKey(target)) || !!data?.poll
@@ -441,7 +452,7 @@ export function Stock() {
                     </div>
                     <SpecList specs={p.specs} />
                     <StockSummary p={p} focus={location} target={target} />
-                    {open && <Detail target={target} code={p.code} focus={location} />}
+                    {open && <Detail target={target} code={p.code} focus={location} onSubscribe={(c) => subscribe(p.code, c)} />}
                   </li>
                 )
               })}
@@ -488,7 +499,7 @@ export function Stock() {
                         {open && (
                           <tr>
                             <td colSpan={5} className="bg-zinc-50/60 px-4 py-3 dark:bg-zinc-950/40">
-                              <Detail target={target} code={p.code} focus={location} />
+                              <Detail target={target} code={p.code} focus={location} onSubscribe={(c) => subscribe(p.code, c)} />
                             </td>
                           </tr>
                         )}

@@ -108,6 +108,7 @@ export interface Subscription {
   region: string
   productCode: string
   locations: string[]
+  configs: string[] // exact configuration ids; empty = any
   configFilter: string
   notifyOn: 'restock' | 'all'
   enabled: boolean

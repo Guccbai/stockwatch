@@ -551,7 +551,11 @@ func (m *Monitor) SubscriptionsText(ctx context.Context) string {
 		if len(s.Locations) > 0 {
 			locs = labels.Locations(s.Locations)
 		}
-		fmt.Fprintf(&b, "%s #%d %s <code>%s</code> · %s\n", state, s.ID, labels.Target(s.Provider, s.Region), s.ProductCode, locs)
+		fmt.Fprintf(&b, "%s #%d %s <code>%s</code> · %s", state, s.ID, labels.Target(s.Provider, s.Region), s.ProductCode, locs)
+		for _, c := range s.Configs {
+			fmt.Fprintf(&b, "\n　· %s", labels.Config(c, s.ProductCode))
+		}
+		b.WriteString("\n")
 	}
 	return b.String()
 }

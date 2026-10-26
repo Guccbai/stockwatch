@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { api, type Subscription, type SubscriptionInput } from '../api'
 import { emptySubscription, SubscriptionForm } from '../components/SubscriptionForm'
 import { Badge, Button, Card, Empty, PageHeader, Spinner, StatusDot, Toggle, useToast } from '../components/ui'
-import { locationName, locationShort, timeAgo } from '../lib'
+import { configText, locationName, locationShort, timeAgo } from '../lib'
 import { useTargetName } from '../components/RegionPicker'
 
 const toInput = ({ id: _id, createdAt: _c, ...rest }: Subscription): SubscriptionInput => rest
@@ -63,7 +63,7 @@ export function Subscriptions() {
                   <th className="px-4 py-2.5 text-left font-medium">机型</th>
                   <th className="px-3 py-2.5 text-left font-medium">区域</th>
                   <th className="px-3 py-2.5 text-left font-medium">机房</th>
-                  <th className="px-3 py-2.5 text-left font-medium">配置过滤</th>
+                  <th className="px-3 py-2.5 text-left font-medium">配置</th>
                   <th className="px-3 py-2.5 text-left font-medium">通知</th>
                   <th className="px-3 py-2.5 text-left font-medium">当前</th>
                   <th className="px-3 py-2.5 text-left font-medium">启用</th>
@@ -96,7 +96,15 @@ export function Subscriptions() {
                           <span className="text-xs text-zinc-500">全部</span>
                         )}
                       </td>
-                      <td className="px-3 py-3 font-mono text-xs text-zinc-600 dark:text-zinc-300">{s.configFilter || <span className="font-sans text-zinc-400">—</span>}</td>
+                      <td className="min-w-48 px-3 py-3 text-xs text-zinc-600 dark:text-zinc-300">
+                        {s.configs.map((c) => (
+                          <div key={c} title={c}>
+                            {configText(c, s.productCode)}
+                          </div>
+                        ))}
+                        {s.configFilter && <div className="font-mono">{s.configFilter}</div>}
+                        {!s.configs.length && !s.configFilter && <span className="text-zinc-500">全部</span>}
+                      </td>
                       <td className="px-3 py-3 text-xs whitespace-nowrap">{s.notifyOn === 'all' ? '补货 + 售罄' : '仅补货'}</td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         {w ? (

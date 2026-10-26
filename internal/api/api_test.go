@@ -94,8 +94,9 @@ func TestAPIFlow(t *testing.T) {
 		t.Fatalf("want 400 for unknown region, got %d", code)
 	}
 	created.Note = "hi"
+	created.Configs = []string{"fake-small.ram-32g"}
 	var updated store.Subscription
-	if code := do(t, c, "PUT", u+"/subscriptions/"+itoa(created.ID), created, &updated); code != 200 || updated.Note != "hi" {
+	if code := do(t, c, "PUT", u+"/subscriptions/"+itoa(created.ID), created, &updated); code != 200 || updated.Note != "hi" || len(updated.Configs) != 1 {
 		t.Fatalf("update: %d %+v", code, updated)
 	}
 
