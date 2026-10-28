@@ -28,6 +28,10 @@ docker run -d --name stockwatch -p 8080:8080 -v ./data:/data \
 
 打开 http://localhost:8080 ，用 `SW_ADMIN_PASSWORD` 登录，在「设置」中填写 Telegram Bot Token 和 Chat ID，或 Resend API Key、发件人和收件人，点击「发送测试消息 / 测试邮件」确认。
 
+### Cloudflare Workers
+
+不想维护服务器，也可以部署到 Cloudflare Workers + Durable Objects（需 Workers 付费计划），WebUI 与功能相同，见 [cf/README.md](cf/README.md)。
+
 ### 预编译二进制
 
 在 [Releases](https://github.com/Guccbai/stockwatch/releases) 下载对应平台的压缩包（Linux / macOS / Windows / FreeBSD，含 arm64 与 armv7），解压后运行：
@@ -78,6 +82,7 @@ internal/notify         Notifier 接口；telegram/、resend/ 为 Telegram、邮
 internal/store          SQLite 持久化与迁移
 internal/api            REST API、鉴权、SSE、内嵌 SPA
 web/                    React + Vite + Tailwind WebUI
+cf/                     Cloudflare Workers 版（TypeScript，共用 web/）
 ```
 
 每个（服务商, 区域）一个轮询协程：拉取全量库存 → 与上次状态对比 → 只有状态跃迁才记录事件 → 匹配订阅 → 合并通知。首次见到的配置只记录基线，不会在首次启动时刷屏。失败时指数退避（最长 10 分钟）；接口异常返回空数据时会忽略本次结果。
