@@ -44,7 +44,7 @@ export function Login() {
           <Button type="submit" variant="primary" loading={loading} disabled={!password} className="mt-5 w-full">
             登录
           </Button>
-          <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">首次启动时的密码来自环境变量 SW_ADMIN_PASSWORD，未设置时会打印在服务日志中。</p>
+          <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-400">首次登录密码来自 Worker Secret ADMIN_PASSWORD（npx wrangler secret put ADMIN_PASSWORD）。</p>
         </form>
       </div>
     </div>

@@ -1,5 +1,6 @@
-/bin/
 data/
 *.db
 *.db-*
-/dist/
+node_modules/
+.wrangler/
+.dev.vars

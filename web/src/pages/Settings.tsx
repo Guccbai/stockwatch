@@ -53,7 +53,7 @@ function TelegramCard({ s }: { s: Settings }) {
           label="Bot Token"
           hint={
             s.envOverrides.telegramToken
-              ? '由环境变量 SW_TELEGRAM_TOKEN 提供，无法在此修改'
+              ? '由 Worker Secret TELEGRAM_TOKEN 提供，无法在此修改'
               : s.telegramTokenSet
                 ? `已设置（${s.telegramTokenHint || '已隐藏'}），留空保持不变`
                 : '在 Telegram 中与 @BotFather 对话创建机器人获取'
@@ -61,7 +61,7 @@ function TelegramCard({ s }: { s: Settings }) {
         >
           <Input type="password" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)} placeholder={s.telegramTokenSet ? '••••••••' : '123456789:AA…'} disabled={s.envOverrides.telegramToken} />
         </Field>
-        <Field label="Chat ID" hint={s.envOverrides.telegramChatId ? '由环境变量 SW_TELEGRAM_CHAT_ID 提供' : '多个用英文逗号分隔。向机器人发送任意消息后，可通过 @userinfobot 或 getUpdates 获取；群组 ID 以 -100 开头'}>
+        <Field label="Chat ID" hint={s.envOverrides.telegramChatId ? '由 Worker Secret TELEGRAM_CHAT_ID 提供' : '多个用英文逗号分隔。向机器人发送任意消息后，可通过 @userinfobot 或 getUpdates 获取；群组 ID 以 -100 开头'}>
           <Input value={chatId} onChange={(e) => setChatId(e.target.value)} placeholder="例如 123456789" disabled={s.envOverrides.telegramChatId} />
         </Field>
         <Toggle checked={commands} onChange={setCommands} label="启用机器人命令（/status /subs /pause /resume）" />
@@ -112,7 +112,7 @@ function ResendCard({ s }: { s: Settings }) {
           label="API Key"
           hint={
             s.envOverrides.resendApiKey
-              ? '由环境变量 SW_RESEND_API_KEY 提供，无法在此修改'
+              ? '由 Worker Secret RESEND_API_KEY 提供，无法在此修改'
               : s.resendKeySet
                 ? `已设置（${s.resendKeyHint || '已隐藏'}），留空保持不变`
                 : '在 resend.com/api-keys 创建，需要 Sending access 权限'
@@ -120,10 +120,10 @@ function ResendCard({ s }: { s: Settings }) {
         >
           <Input type="password" autoComplete="off" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder={s.resendKeySet ? '••••••••' : 're_…'} disabled={s.envOverrides.resendApiKey} />
         </Field>
-        <Field label="发件人" hint={s.envOverrides.resendFrom ? '由环境变量 SW_RESEND_FROM 提供' : '必须使用已在 Resend 验证的域名；测试可用 onboarding@resend.dev（仅能发给自己的账号邮箱）'}>
+        <Field label="发件人" hint={s.envOverrides.resendFrom ? '由 Worker Secret RESEND_FROM 提供' : '必须使用已在 Resend 验证的域名；测试可用 onboarding@resend.dev（仅能发给自己的账号邮箱）'}>
           <Input value={from} onChange={(e) => setFrom(e.target.value)} placeholder="StockWatch <alerts@example.com>" disabled={s.envOverrides.resendFrom} />
         </Field>
-        <Field label="收件人" hint={s.envOverrides.resendTo ? '由环境变量 SW_RESEND_TO 提供' : '多个用英文逗号分隔'}>
+        <Field label="收件人" hint={s.envOverrides.resendTo ? '由 Worker Secret RESEND_TO 提供' : '多个用英文逗号分隔'}>
           <Input value={to} onChange={(e) => setTo(e.target.value)} placeholder="me@example.com" disabled={s.envOverrides.resendTo} />
         </Field>
         <div className="flex flex-wrap gap-2 pt-1">

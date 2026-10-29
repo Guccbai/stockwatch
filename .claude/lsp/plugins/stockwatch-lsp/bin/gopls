@@ -1,6 +1,0 @@
-#!/bin/sh
-# gopls pinned in tools/go.mod; `go tool` needs to run from the module root.
-set -e
-root="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../../../../.." && pwd)}"
-cd "$root"
-exec go tool -modfile=tools/go.mod gopls "$@"
