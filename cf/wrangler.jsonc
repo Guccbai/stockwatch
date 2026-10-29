@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stockwatch",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": true },
+  // The WebUI (built by `npm run build:web`); only /api/* and /telegram/* reach the Worker.
+  "assets": {
+    "directory": "../web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/telegram/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      { "name": "HUB", "class_name": "Hub" },
+      { "name": "POLLER", "class_name": "Poller" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Hub", "Poller"] }],
+  "vars": {
+    "VERSION": "dev",
+    // Adds a demo provider whose stock flips every poll, to exercise notifications end to end.
+    "FAKE_PROVIDER": "false"
+  }
+  // Secrets (wrangler secret put, or .dev.vars locally): ADMIN_PASSWORD; optionally TELEGRAM_TOKEN,
+  // TELEGRAM_CHAT_ID, RESEND_API_KEY, RESEND_FROM, RESEND_TO to override the WebUI settings.
+}

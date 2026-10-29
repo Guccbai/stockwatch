@@ -18,13 +18,22 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: |
+            web/package-lock.json
+            cf/package-lock.json
 
       - name: Build WebUI (includes type check)
         working-directory: web
         run: |
           npm ci
           npm run build
+
+      - name: Cloudflare Workers version (type check + tests)
+        working-directory: cf
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
 
       - uses: actions/setup-go@v7
         with:

@@ -1,0 +1,3 @@
+ADMIN_PASSWORD=change-me-please
+FAKE_PROVIDER=true
+# TELEGRAM_WEBHOOK_SECRET=any-random-string
