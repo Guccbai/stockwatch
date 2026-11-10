@@ -42,6 +42,16 @@ npm run deploy                            # 构建 ../web 并部署
 
 建议部署后先确认 OVH 不拦截 Cloudflare 的出口 IP：登录后访问 `/api/probe`（默认探测 eu、ca、us 三个区域）。
 
+### 自动部署（GitHub Actions）
+
+[`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) 在 `main` 上 `cf/`、`web/` 有变更时自动类型检查、测试并部署；也可在 Actions 页面手动运行（Deploy → Run workflow）。部署的 `VERSION` 为 `main-<提交短哈希>`，`/api/health` 可查看。
+
+首次启用前：
+
+1. 先按上面的步骤手动部署一次，并用 `wrangler secret put` 设置 `ADMIN_PASSWORD` 等 Secret（自动部署不会改动已有 Secret）。
+2. 在 Cloudflare 控制台 → My Profile → API Tokens 用「Edit Cloudflare Workers」模板创建 Token；Account ID 在 Workers 概览页右侧。
+3. 在 GitHub 仓库 Settings → Secrets and variables → Actions 添加 `CLOUDFLARE_API_TOKEN` 与 `CLOUDFLARE_ACCOUNT_ID`（放在仓库级或 `cloudflare` 环境下均可；放在环境下还可配置审批等保护规则）。
+
 ### 配置
 
 | 名称 | 类型 | 说明 |
